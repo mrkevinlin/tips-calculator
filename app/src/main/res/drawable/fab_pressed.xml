@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:left="2dp" android:top="1dp" android:right="2dp" android:bottom="5dp">
+        <shape android:shape="oval">
+            <solid android:color="@color/light_green_highlight" />
+        </shape>
+    </item>
+
+    <item android:left="2dp" android:top="3dp" android:right="2dp" android:bottom="3dp">
+        <shape android:shape="oval">
+            <solid android:color="@color/light_green_darken" />
+        </shape>
+    </item>
+
+    <item android:left="2dp" android:top="2dp" android:right="2dp" android:bottom="4dp">
+        <shape android:shape="oval">
+            <solid android:color="@color/light_green_pressed" />
+        </shape>
+    </item>
+
+</layer-list>

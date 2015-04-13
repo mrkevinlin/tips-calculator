@@ -1,0 +1,17 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#e5e5e5"
+    tools:context="com.scepticallistic.kevin.tipscalc.MainActivity"
+    android:clickable="true"
+    android:focusableInTouchMode="true">
+
+    <fragment
+        android:id="@+id/fragment_calculator"
+        android:name="com.scepticallistic.kevin.tipscalc.CalculatorFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout="@android:layout/list_content" />
+
+</LinearLayout>

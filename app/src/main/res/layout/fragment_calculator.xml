@@ -1,0 +1,256 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <!--android:focusable="true"-->
+    <!--android:focusableInTouchMode="true"-->
+
+    <ScrollView
+        android:id="@+id/scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/calculator_card"
+                style="@style/CardStyle"
+                android:layout_marginTop="8dp">
+
+                <LinearLayout
+                    android:id="@+id/calc_elements"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout style="@style/CalculatorRows">
+
+                        <TextView
+                            style="@style/DollarTheme"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/dollar" />
+
+                        <com.rengwuxian.materialedittext.MaterialEditText
+                            android:id="@+id/sale_amount"
+                            style="@style/NumberTheme"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/sale_text"
+                            android:nextFocusDown="@+id/percent_amount"
+                            android:nextFocusForward="@+id/percent_amount"
+                            app:met_textColor="@color/blue_gray">
+                            <requestFocus />
+                        </com.rengwuxian.materialedittext.MaterialEditText>
+
+                    </LinearLayout>
+
+                    <LinearLayout style="@style/CalculatorRows">
+
+                        <TextView
+                            style="@style/DollarTheme"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/dollar"
+                            android:visibility="invisible" />
+                        <!--<AutoCompleteTextView-->
+                        <!--TODO: DROP DOWNS??-->
+                        <com.rengwuxian.materialedittext.MaterialEditText
+                            android:id="@+id/percent_amount"
+                            style="@style/NumberTheme"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:hint="@string/tip_pct_text"
+                            android:nextFocusDown="@+id/tip_amount"
+                            android:nextFocusForward="@+id/tip_amount" />
+
+                        <TextView
+                            style="@style/DollarTheme"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingEnd="32dp"
+                            android:paddingRight="32dp"
+                            android:text="@string/pct_text" />
+
+                        <TextView
+                            style="@style/DollarTheme"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/dollar" />
+
+                        <com.rengwuxian.materialedittext.MaterialEditText
+                            android:id="@+id/tip_amount"
+                            style="@style/NumberTheme"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2"
+                            android:hint="@string/tip_amt_text" />
+
+                    </LinearLayout>
+
+                    <LinearLayout style="@style/CalculatorRows">
+
+                        <TextView
+                            style="@style/DollarTheme"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/dollar" />
+
+                        <com.rengwuxian.materialedittext.MaterialEditText
+                            android:id="@+id/total_amount"
+                            style="@style/NumberTheme"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/total_text"
+                            app:met_textColor="@color/green" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        style="@style/CalculatorRows"
+                        android:gravity="end"
+                        android:padding="0dp">
+
+                        <Button
+                            android:id="@+id/clear_button"
+                            style="@style/FunctionButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/clear_button_text"
+                            android:textColor="@color/gray" />
+
+                        <Button
+                            android:id="@+id/round_button"
+                            style="@style/FunctionButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/round_button_text"
+                            android:textColor="@color/blue" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/split_card"
+                style="@style/CardStyle"
+                android:visibility="gone"
+                app:contentPadding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/take_people"
+                            style="@style/IncrementButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/subtract" />
+
+                        <TextView
+                            android:id="@+id/people_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:padding="8dp"
+                            android:textSize="24sp" />
+
+                        <Button
+                            android:id="@+id/add_people"
+                            style="@style/IncrementButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/add" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="24dp">
+
+                        <TextView
+                            android:id="@+id/split_total"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/green"
+                            android:textSize="44sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/per_person"
+                            android:textSize="16sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:paddingTop="16dp">
+
+                        <TextView
+                            android:id="@+id/split_tip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/light_green"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/tip_per"
+                            android:textSize="16sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+        </LinearLayout>
+    </ScrollView>
+
+
+    <FrameLayout
+        android:id="@+id/fab"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_margin="16dp"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/split_button"
+            style="@style/FAB" />
+
+        <View
+            android:id="@+id/fab_plus"
+            style="@style/FabPlus"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/fab_plus"/>
+
+    </FrameLayout>
+
+</RelativeLayout>

@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">Tips Calculator</string>
+
+    <string name="dollar">$</string>
+    <string name="sale_text">Sale</string>
+    <string name="tip_pct_text">Pct</string>
+    <string name="pct_text">%</string>
+    <string name="tip_amt_text">Tip</string>
+    <string name="total_text">Total</string>
+    <string name="action_about">Help and feedback</string>
+    <string-array name="percent_array">
+        <item>15</item>
+        <item>18</item>
+        <item>20</item>
+    </string-array>
+
+    <string name="clear_button_text">Clear</string>
+    <string name="round_button_text">Round</string>
+
+    <string name="add" translatable="false">\u002b</string>
+    <string name="subtract" translatable="false">\u2014</string>
+
+    <string name="people">\u0020people</string>
+    <string name="per_person">\u0020per person</string>
+    <string name="tip_per">\u0020from tips</string>
+
+    <string name="general_help_text">Enter in the amount of the sale, and then filling any other
+        blank will cause the rest to calculate.</string>
+    <string name="functions_help_text"><![CDATA[  Clear all the values with
+        <font color=#919191>CLEAR</font>, or round the total to the nearest whole dollar value with
+        <font color=#3ea8c3>ROUND</font>.]]></string>
+    <string name="split_help_text"><![CDATA[  Tap the + <font color="#8BC34A">button</font> to
+        toggle splitting the check. Tap again or decrease the total number of people to 1 to hide.]]></string>
+    <string name="send_feedback_text">Send Feedback</string>
+    <string name="inquiry_text">Any bugs or suggestions?</string>
+    <string name="contact_button_text">Send them here</string>
+</resources>
