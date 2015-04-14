@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:left="29dp" android:top="21dp" android:right="29dp" android:bottom="21dp">
+    <item android:left="27dp" android:top="19dp" android:right="27dp" android:bottom="19dp">
         <shape android:shape="rectangle">
             <solid android:color="@color/white"/>
         </shape>
     </item>
 
-    <item android:left="21dp" android:top="29dp" android:right="21dp" android:bottom="29dp">
+    <item android:left="19dp" android:top="27dp" android:right="19dp" android:bottom="27dp">
         <shape android:shape="rectangle">
             <solid android:color="@color/white"/>
         </shape>

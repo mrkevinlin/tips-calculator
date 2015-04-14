@@ -1,34 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item>
+        <bitmap android:src="@drawable/fab_shadow"
+            android:antialias="true"
+            android:dither="true">
+        </bitmap>
+    </item>
+
+    <item android:left="8dp" android:top="6dp" android:right="8dp" android:bottom="8dp">
         <shape android:shape="oval">
-            <size android:width="70dp" android:height="70dp" />
-            <gradient
-                android:type="radial"
-                android:startColor="#FF000000"
-                android:centerColor="#57000000"
-                android:endColor="#00000000"
-                android:gradientRadius="50%" />
+            <solid android:color="@color/light_green_highlight" />
         </shape>
     </item>
 
-    <item android:left="2dp" android:top="1dp" android:right="2dp" android:bottom="5dp">
+    <item android:left="8dp" android:top="8dp" android:right="8dp" android:bottom="6dp">
         <shape android:shape="oval">
-            <solid android:color="@color/blue" />
+            <solid android:color="@color/light_green_darken" />
         </shape>
     </item>
 
-    <item android:left="2dp" android:top="3dp" android:right="2dp" android:bottom="3dp">
+    <item android:left="8dp" android:top="7dp" android:right="8dp" android:bottom="7dp">
         <shape android:shape="oval">
-            <solid android:color="@color/blue" />
-        </shape>
-    </item>
-
-    <item android:left="2dp" android:top="2dp" android:right="2dp" android:bottom="4dp">
-        <shape android:shape="oval">
-            <solid android:color="@color/light_green" />
+            <solid android:color="@color/light_green_focus" />
         </shape>
     </item>
 

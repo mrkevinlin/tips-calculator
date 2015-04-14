@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewAnimationUtils;
@@ -174,9 +173,6 @@ public class CalculatorFragment extends Fragment {
                 - (int) (shift.topMargin + calculator_card.getPaddingBottom());
         int radius = (int) Math.sqrt(Math.pow(calculator_card.getWidth(), 2) + Math.pow(calculator_card.getHeight(), 2));
 
-        Log.d(LOG_TAG, Integer.toString(radius));
-        Log.d(LOG_TAG, Integer.toString(Math.max(calculator_card.getWidth(), calculator_card.getHeight())));
-
         Animator reveal = ViewAnimationUtils.createCircularReveal(
                 calculator_card,
                 centerX,
@@ -194,6 +190,7 @@ public class CalculatorFragment extends Fragment {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
+                ((ScrollView) scroll_view).smoothScrollTo(0, split_card.getBottom());
             }
         });
         setPeople();

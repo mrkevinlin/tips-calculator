@@ -168,8 +168,8 @@
                             android:id="@+id/people_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:padding="8dp"
                             android:gravity="center"
+                            android:padding="8dp"
                             android:textSize="24sp" />
 
                         <Button
@@ -233,12 +233,11 @@
 
     <FrameLayout
         android:id="@+id/fab"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="84dp"
+        android:layout_height="84dp"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_margin="16dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:gravity="center">
 
         <Button
@@ -248,8 +247,9 @@
         <View
             android:id="@+id/fab_plus"
             style="@style/FabPlus"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="center"
             android:background="@drawable/fab_plus" />
 
     </FrameLayout>

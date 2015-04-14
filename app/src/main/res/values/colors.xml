@@ -11,7 +11,7 @@
     <color name="light_green">#8BC34A</color>
     <color name="light_green_highlight">#ffb7e9a8</color>
     <color name="light_green_darken">#ff76a739</color>
-    <color name="light_green_pressed">#ffb6de80</color>
+    <color name="light_green_focus">#ffb6de80</color>
     <color name="green">#2E7D32</color>
 
     <color name="blue">#ff3ea8c3</color>

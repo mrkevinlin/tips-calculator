@@ -8,6 +8,14 @@
         <item name="android:textSize">24sp</item>
     </style>
 
+    <style name="FAB" parent="@android:style/Widget.Material.Button">
+        <item name="android:layout_width">56dp</item>
+        <item name="android:layout_height">56dp</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:background">@drawable/fab_ripple</item>
+        <item name="android:stateListAnimator">@anim/fab_rise</item>
+    </style>
+
     <style name="FabPlus">
         <item name="android:elevation">10dp</item>
     </style>

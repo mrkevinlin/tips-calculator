@@ -52,8 +52,9 @@
     </style>
 
     <style name="FAB" parent="@android:style/Widget.Button">
-        <item name="android:layout_width">60dp</item>
-        <item name="android:layout_height">60dp</item>
+        <item name="android:layout_width">72dp</item>
+        <item name="android:layout_height">72dp</item>
+        <item name="android:layout_gravity">center</item>
         <item name="android:background">@drawable/fab</item>
     </style>
 
