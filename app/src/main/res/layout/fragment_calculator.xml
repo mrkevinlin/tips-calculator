@@ -164,22 +164,12 @@
                             android:layout_height="wrap_content"
                             android:text="@string/subtract" />
 
-                        <EditText
+                        <TextView
                             android:id="@+id/people_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:background="@null"
+                            android:padding="8dp"
                             android:gravity="center"
-                            android:inputType="number"
-                            android:textCursorDrawable="@drawable/color_cursor"
-                            android:textSize="24sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingBottom="8dp"
-                            android:paddingTop="8dp"
-                            android:text="@string/people"
                             android:textSize="24sp" />
 
                         <Button

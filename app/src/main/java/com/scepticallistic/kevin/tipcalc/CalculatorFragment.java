@@ -6,7 +6,6 @@ import android.annotation.TargetApi;
 import android.graphics.Outline;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -19,7 +18,6 @@ import android.view.ViewOutlineProvider;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -36,16 +34,6 @@ public class CalculatorFragment extends Fragment {
 
     public CalculatorFragment() {
 
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-
-
-        }
     }
 
     @Override
@@ -83,8 +71,6 @@ public class CalculatorFragment extends Fragment {
         people_count = rootView.findViewById(R.id.people_count);
         split_tip = rootView.findViewById(R.id.split_tip);
         split_total = rootView.findViewById(R.id.split_total);
-
-        ((EditText) sale_text).setSelection(0);
 
 //        ArrayList<View> calculatorElements = new ArrayList<>();
 //        calculatorElements.add(sale_text);
@@ -360,32 +346,6 @@ public class CalculatorFragment extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
         });
-
-        ((TextView) people_count).addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                try {
-                    if (s.length() != 0) {
-                        people = Integer.parseInt(((TextView) people_count).getText().toString());
-                    } else {
-                        people = 2;
-                    }
-                    totalChanged();
-                } catch (NumberFormatException e) {
-                    Log.d(LOG_TAG, e.getMessage());
-                }
-            }
-        });
     }
 
     private void saleChanged() {
@@ -464,7 +424,7 @@ public class CalculatorFragment extends Fragment {
     }
 
     private void setPeople() {
-        ((TextView) people_count).setText(Integer.toString(people));
+        ((TextView) people_count).setText(Integer.toString(people) + getString(R.string.people));
     }
 
 //    private void setHideKeyboard(View root, ArrayList<View> calcElems) {
