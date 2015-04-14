@@ -1,4 +1,4 @@
-package com.scepticallistic.kevin.tipscalc;
+package com.scepticallistic.kevin.tipcalc;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

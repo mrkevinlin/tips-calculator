@@ -1,4 +1,4 @@
-package com.scepticallistic.kevin.tipscalc;
+package com.scepticallistic.kevin.tipcalc;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;

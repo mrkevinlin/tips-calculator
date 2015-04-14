@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Tips Calculator</string>
+    <string name="app_name">Tip Calculator</string>
 
     <string name="dollar">$</string>
     <string name="sale_text">Sale</string>

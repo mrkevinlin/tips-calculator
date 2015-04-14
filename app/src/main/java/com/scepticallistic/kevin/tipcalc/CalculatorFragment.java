@@ -1,4 +1,4 @@
-package com.scepticallistic.kevin.tipscalc;
+package com.scepticallistic.kevin.tipcalc;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -118,7 +118,7 @@ public class CalculatorFragment extends Fragment {
                 total = 0;
                 recalculate = true;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    revealCard(clear_button);
+                    clearReveal(clear_button);
                 }
             }
         });
@@ -179,7 +179,7 @@ public class CalculatorFragment extends Fragment {
     }
 
     @TargetApi(21)
-    private void revealCard(Button source) {
+    private void clearReveal(Button source) {
         LinearLayout.LayoutParams shift = (LinearLayout.LayoutParams) calculator_card.getLayoutParams();
 
         int centerX = ((source.getLeft() + source.getRight()) / 2)
@@ -360,6 +360,32 @@ public class CalculatorFragment extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
         });
+
+        ((TextView) people_count).addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                try {
+                    if (s.length() != 0) {
+                        people = Integer.parseInt(((TextView) people_count).getText().toString());
+                    } else {
+                        people = 2;
+                    }
+                    totalChanged();
+                } catch (NumberFormatException e) {
+                    Log.d(LOG_TAG, e.getMessage());
+                }
+            }
+        });
     }
 
     private void saleChanged() {
@@ -438,7 +464,7 @@ public class CalculatorFragment extends Fragment {
     }
 
     private void setPeople() {
-        ((TextView) people_count).setText(Integer.toString(people) + getString(R.string.people));
+        ((TextView) people_count).setText(Integer.toString(people));
     }
 
 //    private void setHideKeyboard(View root, ArrayList<View> calcElems) {

@@ -45,6 +45,7 @@
                             android:nextFocusDown="@+id/percent_amount"
                             android:nextFocusForward="@+id/percent_amount"
                             app:met_textColor="@color/blue_gray">
+
                             <requestFocus />
                         </com.rengwuxian.materialedittext.MaterialEditText>
 
@@ -163,12 +164,22 @@
                             android:layout_height="wrap_content"
                             android:text="@string/subtract" />
 
-                        <TextView
+                        <EditText
                             android:id="@+id/people_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:background="@null"
                             android:gravity="center"
-                            android:padding="8dp"
+                            android:inputType="number"
+                            android:textCursorDrawable="@drawable/color_cursor"
+                            android:textSize="24sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingBottom="8dp"
+                            android:paddingTop="8dp"
+                            android:text="@string/people"
                             android:textSize="24sp" />
 
                         <Button
@@ -249,7 +260,7 @@
             style="@style/FabPlus"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:background="@drawable/fab_plus"/>
+            android:background="@drawable/fab_plus" />
 
     </FrameLayout>
 
