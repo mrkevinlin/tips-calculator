@@ -46,8 +46,9 @@
     </style>
 
     <style name="FunctionButton" parent="@android:style/Widget.DeviceDefault.Button.Borderless">
-        <item name="android:paddingLeft">16dp</item>
-        <item name="android:paddingRight">16dp</item>
+        <item name="android:background">@drawable/button</item>
+        <item name="android:paddingLeft">8dp</item>
+        <item name="android:paddingRight">8dp</item>
     </style>
 
     <style name="FAB" parent="@android:style/Widget.Button">
@@ -57,7 +58,7 @@
     </style>
 
     <style name="IncrementButton" parent="@android:style/TextAppearance.Holo.Widget.Button">
-        <item name="android:background">@drawable/increment_button</item>
+        <item name="android:background">@drawable/button</item>
         <item name="android:textColor">@color/light_green</item>
         <item name="android:textSize">24sp</item>
         <item name="android:padding">0dp</item>

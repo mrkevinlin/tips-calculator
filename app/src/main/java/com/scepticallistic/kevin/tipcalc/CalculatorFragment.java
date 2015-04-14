@@ -169,7 +169,7 @@ public class CalculatorFragment extends Fragment {
         LinearLayout.LayoutParams shift = (LinearLayout.LayoutParams) calculator_card.getLayoutParams();
 
         int centerX = ((source.getLeft() + source.getRight()) / 2)
-                + (int) shift.leftMargin;
+                + shift.leftMargin;
         int centerY = (calculator_card.getBottom() - (source.getHeight() / 2))
                 - (int) (shift.topMargin + calculator_card.getPaddingBottom());
         int radius = (int) Math.sqrt(Math.pow(calculator_card.getWidth(), 2) + Math.pow(calculator_card.getHeight(), 2));
