@@ -32,6 +32,6 @@
     <string name="split_help_text"><![CDATA[  Tap the + <font color="#8BC34A">button</font> to
         toggle splitting the check. Tap again or decrease the total number of people to 1 to hide.]]></string>
     <string name="send_feedback_text">Send Feedback</string>
-    <string name="inquiry_text">Any bugs or suggestions?</string>
-    <string name="contact_button_text">Send them here</string>
+    <string name="inquiry_text">Any bugs or suggestions? Leave a review or use the developer email listed there! Thanks!</string>
+    <string name="contact_button_text">Play Store link</string>
 </resources>

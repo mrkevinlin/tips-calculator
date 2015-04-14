@@ -1,12 +1,13 @@
 package com.scepticallistic.kevin.tipcalc;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class AboutActivity extends ActionBarActivity {
     @Override
@@ -24,7 +25,9 @@ public class AboutActivity extends ActionBarActivity {
         feedback.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(AboutActivity.this, "Nothing yet! Please leave a review. Sorry!", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.scepticallistic.kevin.tipscalc"));
+                startActivity(intent);
             }
         });
     }
