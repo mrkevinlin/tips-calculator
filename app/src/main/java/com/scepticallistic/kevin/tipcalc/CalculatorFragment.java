@@ -29,15 +29,16 @@ import java.util.ArrayList;
 
 public class CalculatorFragment extends Fragment implements AdapterView.OnItemSelectedListener {
     private static final String LOG_TAG = CalculatorFragment.class.getSimpleName();
-    private static final ArrayList<String> percents = new ArrayList<String>();
-    public View scroll_view, calculator_card, sale_text, percent_text, tip_text, total_text, fab_plus, split_card, people_count, split_tip, split_total;
+    private static final ArrayList<String> percents = new ArrayList<>();
+    public View scroll_view, calculator_card, sale_text, tip_text, total_text, fab_plus, split_card, people_count, split_tip, split_total;
     public Spinner spinner;
     public ArrayAdapter<String> adapter;
     public double sale, percent, tip, total, splitTip, splitTotal;
     public int people = 2;
-    private int percent_array_length;
+    public int percent_array_length;
 
     boolean recalculate = true;
+    boolean rounding = false;
 
     public CalculatorFragment() {
 
@@ -48,12 +49,11 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
 
         View rootView = inflater.inflate(R.layout.fragment_calculator, container, false);
 
-        //Eventually populate from user preference list (use for loop for length of list)
+        //TODO: Eventually populate from user preference list (use for loop for length of list)
         populatePercentArray();
-//        percent_array_length = percents.size();
 
         spinner = (Spinner) rootView.findViewById(R.id.percent_amount_spinner);
-        adapter = new ArrayAdapter<String>(getActivity(),
+        adapter = new ArrayAdapter<>(getActivity(),
                 android.R.layout.simple_spinner_dropdown_item, percents);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
@@ -62,7 +62,6 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         scroll_view = rootView.findViewById(R.id.scroll_view);
         calculator_card = rootView.findViewById(R.id.calculator_card);
         sale_text = rootView.findViewById(R.id.sale_amount);
-//        percent_text = rootView.findViewById(R.id.percent_amount);
         tip_text = rootView.findViewById(R.id.tip_amount);
         total_text = rootView.findViewById(R.id.total_amount);
         split_card = rootView.findViewById(R.id.split_card);
@@ -86,175 +85,11 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         return rootView;
     }
 
-    public void populatePercentArray() {
+    private void populatePercentArray() {
         percents.add("15%");
         percents.add("18%");
         percents.add("20%");
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        if (recalculate) {
-            String percent_number = parent.getItemAtPosition(position).toString();
-            percent_number = percent_number.substring(0, percent_number.length() - 1);
-            try {
-                percent = Double.parseDouble(percent_number);
-                percentChanged();
-            } catch (NumberFormatException e) {
-                Log.d(LOG_TAG, e.getMessage());
-            }
-        }
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
-
-    public void setButtons(View rootView, final Animation rotatePlus, final Animation rotateX) {
-
-        final Button clear_button = (Button) rootView.findViewById(R.id.clear_button);
-        clear_button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                recalculate = false;
-                ((TextView) sale_text).setText("");
-//                ((TextView) percent_text).setText("");
-                ((TextView) tip_text).setText("");
-                ((TextView) total_text).setText("");
-                calcSplits();
-                sale = 0;
-//                percent = 0;
-                percents.clear();
-                populatePercentArray();
-                spinner.setSelection(0);
-                spinner.setAdapter(adapter);
-                tip = 0;
-                total = 0;
-                people = 2;
-                recalculate = true;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    clearReveal(clear_button);
-                }
-                if (split_card.isShown())
-                    hideCard(rotatePlus);
-            }
-        });
-
-        Button round_button = (Button) rootView.findViewById(R.id.round_button);
-        round_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (total != 0) {
-                    ((TextView) total_text).setText(String.format("%.2f", (double) Math.round(total)));
-                    if (split_card.isShown()) {
-                        calcSplits();
-                    }
-                }
-            }
-        });
-
-        Button split_button = (Button) rootView.findViewById(R.id.split_button);
-        split_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if (split_card.isShown()) {
-                    hideCard(rotatePlus);
-                } else {
-                    showCard(rotateX);
-                }
-            }
-        });
-
-        Button add_people = (Button) rootView.findViewById(R.id.add_people);
-        Button take_people = (Button) rootView.findViewById(R.id.take_people);
-
-        add_people.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                people++;
-                setPeople();
-                calcSplits();
-            }
-        });
-
-        take_people.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (people > 2) {
-                    people--;
-                } else {
-                    hideCard(rotatePlus);
-                    people = 2;
-                }
-                setPeople();
-                calcSplits();
-            }
-        });
-    }
-
-    // Material ripple to clear the card
-    @TargetApi(21)
-    private void clearReveal(Button source) {
-        LinearLayout.LayoutParams shift = (LinearLayout.LayoutParams) calculator_card.getLayoutParams();
-
-        int centerX = ((source.getLeft() + source.getRight()) / 2)
-                + shift.leftMargin;
-        int centerY = (calculator_card.getBottom() - (source.getHeight() / 2))
-                - (shift.topMargin + calculator_card.getPaddingBottom());
-        int radius = (int) Math.sqrt(Math.pow(calculator_card.getWidth(), 2) + Math.pow(calculator_card.getHeight(), 2));
-
-        Animator reveal = ViewAnimationUtils.createCircularReveal(
-                calculator_card,
-                centerX,
-                centerY,
-                0,
-                radius);
-        reveal.setDuration(400);
-        reveal.start();
-    }
-
-    private void showCard(Animation animation) {
-        fab_plus.startAnimation(animation);
-        split_card.setVisibility(View.VISIBLE);
-        split_card.animate().alpha(1f).translationY(0f).setDuration(200).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                ((ScrollView) scroll_view).smoothScrollTo(0, split_card.getBottom());
-            }
-        });
-        setPeople();
-        calcSplits();
-    }
-
-    private void hideCard(Animation animation) {
-        fab_plus.startAnimation(animation);
-        split_card.animate().alpha(0f).translationY(-100f).setDuration(200).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                super.onAnimationStart(animation);
-                ((ScrollView) scroll_view).smoothScrollTo(0, 0);
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                split_card.setVisibility(View.GONE);
-            }
-        });
-    }
-
-    // Remove the drop shadow from the + drawable
-    @TargetApi(21)
-    private void removeFABPlusOutline(View plusView) {
-        ViewOutlineProvider viewOutlineProvider = new ViewOutlineProvider() {
-            @Override
-            public void getOutline(View view, Outline outline) {
-                view.setOutlineProvider(null);
-            }
-        };
-        plusView.setOutlineProvider(viewOutlineProvider);
+        percent_array_length = percents.size();
     }
 
     private void setCalcListeners() {
@@ -284,32 +119,6 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
             public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
         });
-
-//        ((TextView) percent_text).addTextChangedListener(new TextWatcher() {
-//
-//            @Override
-//            public void afterTextChanged(Editable s) {
-//
-//                try {
-//                    if (s.length() != 0) {
-//                        percent = Double.parseDouble(((TextView) percent_text).getText().toString());
-//                    } else {
-//                        percent = 0;
-//                    }
-//                    percentChanged();
-//                } catch (NumberFormatException e) {
-////                    Log.d(LOG_TAG, e.getMessage());
-//                }
-//            }
-//
-//            @Override
-//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//            }
-//
-//            @Override
-//            public void onTextChanged(CharSequence s, int start, int before, int count) {
-//            }
-//        });
 
         ((TextView) tip_text).addTextChangedListener(new TextWatcher() {
 
@@ -364,6 +173,179 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         });
     }
 
+    private void setButtons(View rootView, final Animation rotatePlus, final Animation rotateX) {
+
+        final Button clear_button = (Button) rootView.findViewById(R.id.clear_button);
+        clear_button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                recalculate = false;
+                ((TextView) sale_text).setText("");
+                ((TextView) tip_text).setText("");
+                ((TextView) total_text).setText("");
+                calcSplits();
+                sale = 0;
+                resetSpinner();
+                tip = 0;
+                total = 0;
+                people = 2;
+                recalculate = true;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    clearReveal(clear_button);
+                }
+                if (split_card.isShown())
+                    hideCard(rotatePlus);
+            }
+        });
+
+        Button round_button = (Button) rootView.findViewById(R.id.round_button);
+        round_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (total != 0) {
+                    ((TextView) total_text).setText(String.format("%.2f", (double) Math.round(total)));
+                    rounding = true;
+                    if (split_card.isShown()) {
+                        calcSplits();
+                    }
+                }
+            }
+        });
+
+        Button split_button = (Button) rootView.findViewById(R.id.split_button);
+        split_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (split_card.isShown()) {
+                    hideCard(rotatePlus);
+                } else {
+                    showCard(rotateX);
+                }
+            }
+        });
+
+        Button add_people = (Button) rootView.findViewById(R.id.add_people);
+        Button take_people = (Button) rootView.findViewById(R.id.take_people);
+
+        add_people.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                people++;
+                setPeople();
+                calcSplits();
+            }
+        });
+
+        take_people.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (people > 2) {
+                    people--;
+                } else {
+                    hideCard(rotatePlus);
+                    people = 2;
+                }
+                setPeople();
+                calcSplits();
+            }
+        });
+    }
+
+    @TargetApi(21) // Remove the drop shadow from the + drawable
+    private void removeFABPlusOutline(View plusView) {
+        ViewOutlineProvider viewOutlineProvider = new ViewOutlineProvider() {
+            @Override
+            public void getOutline(View view, Outline outline) {
+                view.setOutlineProvider(null);
+            }
+        };
+        plusView.setOutlineProvider(viewOutlineProvider);
+    }
+
+    @TargetApi(21) // Material ripple to clear the card
+    private void clearReveal(Button source) {
+        LinearLayout.LayoutParams shift = (LinearLayout.LayoutParams) calculator_card.getLayoutParams();
+
+        int centerX = ((source.getLeft() + source.getRight()) / 2)
+                + shift.leftMargin;
+        int centerY = (calculator_card.getBottom() - (source.getHeight() / 2))
+                - (shift.topMargin + calculator_card.getPaddingBottom());
+        int radius = (int) Math.sqrt(Math.pow(calculator_card.getWidth(), 2) + Math.pow(calculator_card.getHeight(), 2));
+
+        Animator reveal = ViewAnimationUtils.createCircularReveal(
+                calculator_card,
+                centerX,
+                centerY,
+                0,
+                radius);
+        reveal.setDuration(400);
+        reveal.start();
+    }
+
+    private void showCard(Animation animation) {
+        fab_plus.startAnimation(animation);
+        split_card.setVisibility(View.VISIBLE);
+        split_card.animate().alpha(1f).translationY(0f).setDuration(200).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                ((ScrollView) scroll_view).smoothScrollTo(0, split_card.getBottom());
+            }
+        });
+        setPeople();
+        calcSplits();
+    }
+
+    private void hideCard(Animation animation) {
+        fab_plus.startAnimation(animation);
+        split_card.animate().alpha(0f).translationY(-100f).setDuration(200).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                ((ScrollView) scroll_view).smoothScrollTo(0, 0);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                split_card.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    private void addPercentToSpinner() {
+        if (percents.size() > percent_array_length) {
+            percents.remove(percents.size()-1);
+        }
+        percents.add(String.format("%.1f", percent) + "%");
+        spinner.setAdapter(adapter);
+        spinner.setSelection(percents.size() - 1);
+    }
+
+    private void resetSpinner() {
+        percents.clear();
+        populatePercentArray();
+        spinner.setSelection(0);
+        spinner.setAdapter(adapter);
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        if (recalculate && !rounding) {
+            String percent_number = parent.getItemAtPosition(position).toString();
+            percent_number = percent_number.substring(0, percent_number.length() - 1);
+            try {
+                percent = Double.parseDouble(percent_number);
+                percentChanged();
+            } catch (NumberFormatException e) {
+                Log.d(LOG_TAG, e.getMessage());
+            }
+        }
+        rounding = false;
+    }
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {}
+
     private void saleChanged() {
         if (percent != 0 && recalculate) {
             recalculate = false;
@@ -404,10 +386,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
             total = sale + tip;
 
 
-            percents.add(0, String.format("%.1f", percent) + "%");
-            spinner.setSelection(0);
-            spinner.setAdapter(adapter);
-//            ((TextView) percent_text).setText(String.format("%.1f", percent));
+            addPercentToSpinner();
             ((TextView) total_text).setText(String.format("%.2f", total));
 
             if (split_card.isShown()) {
@@ -424,10 +403,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
             percent = (tip / sale) * 100;
 
             ((TextView) tip_text).setText(String.format("%.2f", tip));
-//            ((TextView) percent_text).setText(String.format("%.1f", percent));
-            percents.add(0, String.format("%.1f", percent) + "%");
-            spinner.setSelection(0);
-            spinner.setAdapter(adapter);
+            addPercentToSpinner();
 
             recalculate = true;
         }
@@ -438,6 +414,10 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
 
     }
 
+    private void setPeople() {
+        ((TextView) people_count).setText(Integer.toString(people) + getString(R.string.people));
+    }
+
     private void calcSplits() {
         splitTip = tip / people;
         splitTotal = total / people;
@@ -446,7 +426,4 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         ((TextView) split_total).setText("$" + String.format("%.2f", splitTotal));
     }
 
-    private void setPeople() {
-        ((TextView) people_count).setText(Integer.toString(people) + getString(R.string.people));
-    }
 }
