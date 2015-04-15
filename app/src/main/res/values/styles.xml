@@ -13,7 +13,7 @@
         <item name="android:layout_marginLeft">8dp</item>
         <item name="android:layout_marginRight">8dp</item>
         <item name="android:layout_marginBottom">8dp</item>
-        <item name="cardBackgroundColor">#FFF</item>
+        <item name="cardBackgroundColor">@color/white</item>
         <item name="cardCornerRadius">2dp</item>
         <item name="cardElevation">2dp</item>
         <item name="contentPadding">8dp</item>

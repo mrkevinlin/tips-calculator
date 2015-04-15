@@ -8,13 +8,8 @@
     <string name="tip_amt_text">Tip</string>
     <string name="total_text">Total</string>
     <string name="action_about">Help and feedback</string>
-    <string-array name="percent_array">
-        <item>15</item>
-        <item>18</item>
-        <item>20</item>
-    </string-array>
 
-    <string name="clear_button_text">Clear</string>
+    <string name="clear_button_text">Reset</string>
     <string name="round_button_text">Round</string>
 
     <string name="add" translatable="false">\u002b</string>

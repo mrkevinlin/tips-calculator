@@ -59,25 +59,31 @@
                             android:layout_height="wrap_content"
                             android:text="@string/dollar"
                             android:visibility="invisible" />
-                        <!--<AutoCompleteTextView-->
-                        <!--TODO: DROP DOWNS??-->
-                        <com.rengwuxian.materialedittext.MaterialEditText
-                            android:id="@+id/percent_amount"
-                            style="@style/NumberTheme"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:hint="@string/tip_pct_text"
-                            android:nextFocusDown="@+id/tip_amount"
-                            android:nextFocusForward="@+id/tip_amount" />
+                        <!---->
+                        <!--<com.rengwuxian.materialedittext.MaterialEditText-->
+                        <!--android:id="@+id/percent_amount"-->
+                        <!--style="@style/NumberTheme"-->
+                        <!--android:layout_width="0dp"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:layout_weight="1"-->
+                        <!--android:hint="@string/tip_pct_text"-->
+                        <!--android:nextFocusDown="@+id/tip_amount"-->
+                        <!--android:nextFocusForward="@+id/tip_amount" />-->
 
-                        <TextView
-                            style="@style/DollarTheme"
+                        <Spinner
+                            android:id="@+id/percent_amount_spinner"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:paddingEnd="32dp"
-                            android:paddingRight="32dp"
-                            android:text="@string/pct_text" />
+                            android:layout_marginEnd="32dp"
+                            android:layout_marginRight="32dp" />
+
+                        <!--<TextView-->
+                        <!--style="@style/DollarTheme"-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:paddingEnd="32dp"-->
+                        <!--android:paddingRight="32dp"-->
+                        <!--android:text="@string/pct_text" />-->
 
                         <TextView
                             style="@style/DollarTheme"
@@ -90,7 +96,7 @@
                             style="@style/NumberTheme"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="2"
+                            android:layout_weight="1"
                             android:hint="@string/tip_amt_text" />
 
                     </LinearLayout>
@@ -236,8 +242,8 @@
         android:layout_width="84dp"
         android:layout_height="84dp"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:gravity="center">
 
         <Button

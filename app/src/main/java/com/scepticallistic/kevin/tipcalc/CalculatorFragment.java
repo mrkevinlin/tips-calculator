@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewAnimationUtils;
@@ -16,18 +17,25 @@ import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
-public class CalculatorFragment extends Fragment {
+import java.util.ArrayList;
 
+public class CalculatorFragment extends Fragment implements AdapterView.OnItemSelectedListener {
     private static final String LOG_TAG = CalculatorFragment.class.getSimpleName();
-    private static final Integer[] percents = new Integer[]{15, 18, 20};
+    private static final ArrayList<String> percents = new ArrayList<String>();
     public View scroll_view, calculator_card, sale_text, percent_text, tip_text, total_text, fab_plus, split_card, people_count, split_tip, split_total;
+    public Spinner spinner;
+    public ArrayAdapter<String> adapter;
     public double sale, percent, tip, total, splitTip, splitTotal;
     public int people = 2;
+    private int percent_array_length;
 
     boolean recalculate = true;
 
@@ -40,71 +48,95 @@ public class CalculatorFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_calculator, container, false);
 
-//        ArrayAdapter<Integer> adapter = new ArrayAdapter<Integer>(getActivity(),
-//                android.R.layout.simple_dropdown_item_1line, percents);
-//        final AutoCompleteTextView autoTextView = (AutoCompleteTextView)
-//                rootView.findViewById(R.id.percent_amount);
-//        autoTextView.setAdapter(adapter);
+        //Eventually populate from user preference list (use for loop for length of list)
+        populatePercentArray();
+//        percent_array_length = percents.size();
 
-        //TODO: figure out why after entering in values, dropdown no longer shows
-//        autoTextView.setOnTouchListener(new View.OnTouchListener(){
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event){
-//                autoTextView.showDropDown();
-//                return false;
-//            }
-//        });
+        spinner = (Spinner) rootView.findViewById(R.id.percent_amount_spinner);
+        adapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_spinner_dropdown_item, percents);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(this);
 
         scroll_view = rootView.findViewById(R.id.scroll_view);
         calculator_card = rootView.findViewById(R.id.calculator_card);
-
         sale_text = rootView.findViewById(R.id.sale_amount);
-        percent_text = rootView.findViewById(R.id.percent_amount);
+//        percent_text = rootView.findViewById(R.id.percent_amount);
         tip_text = rootView.findViewById(R.id.tip_amount);
         total_text = rootView.findViewById(R.id.total_amount);
-
         split_card = rootView.findViewById(R.id.split_card);
-
         fab_plus = rootView.findViewById(R.id.fab_plus);
-
         people_count = rootView.findViewById(R.id.people_count);
         split_tip = rootView.findViewById(R.id.split_tip);
         split_total = rootView.findViewById(R.id.split_total);
 
-//        ArrayList<View> calculatorElements = new ArrayList<>();
-//        calculatorElements.add(sale_text);
-//        calculatorElements.add(percent_text);
-//        calculatorElements.add(tip_text);
-//        calculatorElements.add(total_text);
-
-        //setHideKeyboard(rootView, calculatorElements);
-
         setCalcListeners();
 
-        final Animation rotateX = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_rotate_to_x);
-        final Animation rotatePlus = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_rotate_to_plus);
+        Animation rotateX = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_rotate_to_x);
+        Animation rotatePlus = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_rotate_to_plus);
+
         split_card.animate().alpha(0f).translationY(-100f);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             removeFABPlusOutline(fab_plus);
         }
+
+        setButtons(rootView, rotatePlus, rotateX);
+
+        return rootView;
+    }
+
+    public void populatePercentArray() {
+        percents.add("15%");
+        percents.add("18%");
+        percents.add("20%");
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        if (recalculate) {
+            String percent_number = parent.getItemAtPosition(position).toString();
+            percent_number = percent_number.substring(0, percent_number.length() - 1);
+            try {
+                percent = Double.parseDouble(percent_number);
+                percentChanged();
+            } catch (NumberFormatException e) {
+                Log.d(LOG_TAG, e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
+    public void setButtons(View rootView, final Animation rotatePlus, final Animation rotateX) {
 
         final Button clear_button = (Button) rootView.findViewById(R.id.clear_button);
         clear_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 recalculate = false;
                 ((TextView) sale_text).setText("");
-                ((TextView) percent_text).setText("");
+//                ((TextView) percent_text).setText("");
                 ((TextView) tip_text).setText("");
                 ((TextView) total_text).setText("");
                 calcSplits();
                 sale = 0;
-                percent = 0;
+//                percent = 0;
+                percents.clear();
+                populatePercentArray();
+                spinner.setSelection(0);
+                spinner.setAdapter(adapter);
                 tip = 0;
                 total = 0;
+                people = 2;
                 recalculate = true;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     clearReveal(clear_button);
                 }
+                if (split_card.isShown())
+                    hideCard(rotatePlus);
             }
         });
 
@@ -159,10 +191,9 @@ public class CalculatorFragment extends Fragment {
                 calcSplits();
             }
         });
-
-        return rootView;
     }
 
+    // Material ripple to clear the card
     @TargetApi(21)
     private void clearReveal(Button source) {
         LinearLayout.LayoutParams shift = (LinearLayout.LayoutParams) calculator_card.getLayoutParams();
@@ -170,7 +201,7 @@ public class CalculatorFragment extends Fragment {
         int centerX = ((source.getLeft() + source.getRight()) / 2)
                 + shift.leftMargin;
         int centerY = (calculator_card.getBottom() - (source.getHeight() / 2))
-                - (int) (shift.topMargin + calculator_card.getPaddingBottom());
+                - (shift.topMargin + calculator_card.getPaddingBottom());
         int radius = (int) Math.sqrt(Math.pow(calculator_card.getWidth(), 2) + Math.pow(calculator_card.getHeight(), 2));
 
         Animator reveal = ViewAnimationUtils.createCircularReveal(
@@ -214,6 +245,7 @@ public class CalculatorFragment extends Fragment {
         });
     }
 
+    // Remove the drop shadow from the + drawable
     @TargetApi(21)
     private void removeFABPlusOutline(View plusView) {
         ViewOutlineProvider viewOutlineProvider = new ViewOutlineProvider() {
@@ -226,19 +258,6 @@ public class CalculatorFragment extends Fragment {
     }
 
     private void setCalcListeners() {
-
-//        for (int i = 0; i < calcElems.size(); i++) {
-//            ((TextView)calcElems.get(i)).addTextChangedListener(new TextWatcher() {
-//                @Override
-//                public void afterTextChanged(Editable s) {
-//                    vals[i] = Double.parseDouble(((TextView)calcElems.get(i)).getText().toString());
-//                }
-//                @Override
-//                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-//                @Override
-//                public void onTextChanged(CharSequence s, int start, int before, int count) {}
-//            });
-//        }
 
         ((TextView) sale_text).addTextChangedListener(new TextWatcher() {
 
@@ -266,31 +285,31 @@ public class CalculatorFragment extends Fragment {
             }
         });
 
-        ((TextView) percent_text).addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-                try {
-                    if (s.length() != 0) {
-                        percent = Double.parseDouble(((TextView) percent_text).getText().toString());
-                    } else {
-                        percent = 0;
-                    }
-                    percentChanged();
-                } catch (NumberFormatException e) {
-//                    Log.d(LOG_TAG, e.getMessage());
-                }
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-        });
+//        ((TextView) percent_text).addTextChangedListener(new TextWatcher() {
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//
+//                try {
+//                    if (s.length() != 0) {
+//                        percent = Double.parseDouble(((TextView) percent_text).getText().toString());
+//                    } else {
+//                        percent = 0;
+//                    }
+//                    percentChanged();
+//                } catch (NumberFormatException e) {
+////                    Log.d(LOG_TAG, e.getMessage());
+//                }
+//            }
+//
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//            }
+//        });
 
         ((TextView) tip_text).addTextChangedListener(new TextWatcher() {
 
@@ -384,7 +403,11 @@ public class CalculatorFragment extends Fragment {
             percent = (tip / sale) * 100;
             total = sale + tip;
 
-            ((TextView) percent_text).setText(String.format("%.1f", percent));
+
+            percents.add(0, String.format("%.1f", percent) + "%");
+            spinner.setSelection(0);
+            spinner.setAdapter(adapter);
+//            ((TextView) percent_text).setText(String.format("%.1f", percent));
             ((TextView) total_text).setText(String.format("%.2f", total));
 
             if (split_card.isShown()) {
@@ -401,7 +424,10 @@ public class CalculatorFragment extends Fragment {
             percent = (tip / sale) * 100;
 
             ((TextView) tip_text).setText(String.format("%.2f", tip));
-            ((TextView) percent_text).setText(String.format("%.1f", percent));
+//            ((TextView) percent_text).setText(String.format("%.1f", percent));
+            percents.add(0, String.format("%.1f", percent) + "%");
+            spinner.setSelection(0);
+            spinner.setAdapter(adapter);
 
             recalculate = true;
         }
@@ -423,34 +449,4 @@ public class CalculatorFragment extends Fragment {
     private void setPeople() {
         ((TextView) people_count).setText(Integer.toString(people) + getString(R.string.people));
     }
-
-//    private void setHideKeyboard(View root, ArrayList<View> calcElems) {
-//
-//        if (!calcElems.isEmpty()) {
-//            for (int i = 0; i < calcElems.size(); i++) {
-//                calcElems.get(i).setOnFocusChangeListener(new View.OnFocusChangeListener() {
-//                    @Override
-//                    public void onFocusChange(View v, boolean hasFocus) {
-//                        if (hasFocus) {
-//                            showKeyboard(v);
-//                        } else if (!hasFocus) {
-//                            hideKeyboard(v);
-//                        }
-//                    }
-//                });
-//            }
-//        }
-//    }
-//
-//    public void hideKeyboard(View view) {
-//        InputMethodManager inputMethodManager =
-//                (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
-//        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
-//    }
-//
-//    public void showKeyboard(View view) {
-//        InputMethodManager inputMethodManager =
-//                (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
-//        inputMethodManager.showSoftInput(view, 0);
-//    }
 }
