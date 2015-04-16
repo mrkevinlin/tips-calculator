@@ -60,7 +60,7 @@
 
     <style name="IncrementButton" parent="@android:style/TextAppearance.Holo.Widget.Button">
         <item name="android:background">@drawable/button</item>
-        <item name="android:textColor">@color/light_green</item>
+        <item name="android:textColor">@color/blue</item>
         <item name="android:textSize">24sp</item>
         <item name="android:padding">0dp</item>
     </style>

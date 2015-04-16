@@ -9,6 +9,10 @@
     <string name="total_text">Total</string>
     <string name="action_about">Help and feedback</string>
 
+    <string name="custom_dialog_title">Custom percentage</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+
     <string name="clear_button_text">Reset</string>
     <string name="round_button_text">Round</string>
 

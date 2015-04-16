@@ -3,13 +3,15 @@ package com.scepticallistic.kevin.tipcalc;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.graphics.Outline;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewAnimationUtils;
@@ -17,6 +19,8 @@ import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -27,7 +31,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class CalculatorFragment extends Fragment implements AdapterView.OnItemSelectedListener {
+public class CalculatorFragment extends Fragment implements AdapterView.OnItemSelectedListener, PercentDialogFragment.PercentDialogListener {
     private static final String LOG_TAG = CalculatorFragment.class.getSimpleName();
     private static final ArrayList<String> percents = new ArrayList<>();
     public View scroll_view, calculator_card, sale_text, tip_text, total_text, fab_plus, split_card, people_count, split_tip, split_total;
@@ -39,7 +43,6 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
 
     boolean recalculate = true;
     boolean rounding = false;
-
     public CalculatorFragment() {
 
     }
@@ -53,9 +56,8 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         populatePercentArray();
 
         spinner = (Spinner) rootView.findViewById(R.id.percent_amount_spinner);
-        adapter = new ArrayAdapter<>(getActivity(),
-                android.R.layout.simple_spinner_dropdown_item, percents);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item, percents);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
 
@@ -89,12 +91,14 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         percents.add("15%");
         percents.add("18%");
         percents.add("20%");
+        percents.add("Custom");
         percent_array_length = percents.size();
     }
 
     private void setCalcListeners() {
 
-        ((TextView) sale_text).addTextChangedListener(new TextWatcher() {
+        final TextView sale_view = (TextView) sale_text;
+        sale_view.addTextChangedListener(new TextWatcher() {
 
             @Override
             public void afterTextChanged(Editable s) {
@@ -118,6 +122,19 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
+        });
+        sale_view.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                    hideKeyboard();
+                    sale_view.clearFocus();
+//                    spinner.requestFocus();
+                    spinner.performClick();
+                }
+                return true;
+            }
+
         });
 
         ((TextView) tip_text).addTextChangedListener(new TextWatcher() {
@@ -179,6 +196,8 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         clear_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 recalculate = false;
+                ((ScrollView) scroll_view).smoothScrollTo(0, 0);
+
                 ((TextView) sale_text).setText("");
                 ((TextView) tip_text).setText("");
                 ((TextView) total_text).setText("");
@@ -189,11 +208,11 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
                 total = 0;
                 people = 2;
                 recalculate = true;
+                if (split_card.isShown())
+                    hideCard(rotatePlus);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     clearReveal(clear_button);
                 }
-                if (split_card.isShown())
-                    hideCard(rotatePlus);
             }
         });
 
@@ -313,16 +332,33 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         });
     }
 
-    private void addPercentToSpinner() {
-        if (percents.size() > percent_array_length) {
-            percents.remove(percents.size()-1);
+    public void addPercentToSpinner(double p) {
+
+        if (p == 0 && percents.size()==percent_array_length) {
+            resetSpinner();
+        } else if (p != 0) {
+
+            if (percents.size() > percent_array_length) {
+                percents.remove(percents.size() - 1);
+            }
+            percents.add(String.format("%.1f", p) + "%");
+            spinner.setAdapter(adapter);
+            spinner.setSelection(percents.size() - 1);
+
+        } else {
+            spinner.setAdapter(adapter);
+            spinner.setSelection(percents.size() - 1);
         }
-        percents.add(String.format("%.1f", percent) + "%");
-        spinner.setAdapter(adapter);
-        spinner.setSelection(percents.size() - 1);
     }
 
-    private void resetSpinner() {
+    private void showPercentDialog() {
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        PercentDialogFragment percentDialog = new PercentDialogFragment();
+        percentDialog.setTargetFragment(this, 0);
+        percentDialog.show(fm, "custom_percent_dialog");
+    }
+
+    public void resetSpinner() {
         percents.clear();
         populatePercentArray();
         spinner.setSelection(0);
@@ -338,13 +374,17 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
                 percent = Double.parseDouble(percent_number);
                 percentChanged();
             } catch (NumberFormatException e) {
-                Log.d(LOG_TAG, e.getMessage());
+                if (percent_number.equals("Custo")) {
+                    showPercentDialog();
+                }
             }
         }
         rounding = false;
     }
+
     @Override
-    public void onNothingSelected(AdapterView<?> parent) {}
+    public void onNothingSelected(AdapterView<?> parent) {
+    }
 
     private void saleChanged() {
         if (percent != 0 && recalculate) {
@@ -386,7 +426,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
             total = sale + tip;
 
 
-            addPercentToSpinner();
+            addPercentToSpinner(percent);
             ((TextView) total_text).setText(String.format("%.2f", total));
 
             if (split_card.isShown()) {
@@ -403,7 +443,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
             percent = (tip / sale) * 100;
 
             ((TextView) tip_text).setText(String.format("%.2f", tip));
-            addPercentToSpinner();
+            addPercentToSpinner(percent);
 
             recalculate = true;
         }
@@ -424,6 +464,18 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
 
         ((TextView) split_tip).setText("$" + String.format("%.2f", splitTip));
         ((TextView) split_total).setText("$" + String.format("%.2f", splitTotal));
+    }
+
+    private void hideKeyboard() {
+        InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
+                InputMethodManager.HIDE_NOT_ALWAYS);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        percents.clear();
     }
 
 }
