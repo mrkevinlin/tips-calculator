@@ -20,4 +20,12 @@
         android:singleLine="true"
         android:title="@string/pref_percents_label" />
 
+    <EditTextPreference
+        android:defaultValue="@string/pref_people_default"
+        android:dialogTitle="How many people?"
+        android:inputType="number"
+        android:key="@string/pref_people_key"
+        android:singleLine="true"
+        android:title="@string/pref_people_label" />
+
 </PreferenceScreen>

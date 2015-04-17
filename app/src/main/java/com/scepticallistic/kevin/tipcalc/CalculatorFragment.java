@@ -4,9 +4,11 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Outline;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
@@ -31,20 +33,43 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class CalculatorFragment extends Fragment implements AdapterView.OnItemSelectedListener, PercentDialogFragment.PercentDialogListener {
+public class CalculatorFragment extends Fragment implements AdapterView.OnItemSelectedListener, PercentDialogFragment.PercentDialogListener, SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String LOG_TAG = CalculatorFragment.class.getSimpleName();
     private static final ArrayList<String> percents = new ArrayList<>();
-    public View scroll_view, calculator_card, sale_text, tip_text, total_text, fab_plus, split_card, people_count, split_tip, split_total;
+    public View scroll_view, calculator_card, sale_text, tip_text, total_text, fab_plus, split_card, people_count, split_tip, split_total, unit1, unit2, unit3;
     public Spinner spinner;
     public ArrayAdapter<String> adapter;
     public double sale, percent, tip, total, splitTip, splitTotal;
-    public int people = 2;
-    public int percent_array_length, spinnerPosition;
+    public int people, defPeople, percent_array_length, spinnerPosition;
+    public String unitSymbol, defaultPercentList;
 
     boolean recalculate = true;
     boolean rounding = false;
 
     public CalculatorFragment() {
+
+    }
+
+    private void setInitialPreferences(View v) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+        defPeople = Integer.parseInt(sp.getString(
+                        getActivity().getString(R.string.pref_people_key),
+                        getActivity().getString(R.string.pref_people_default)));
+        people = defPeople;
+
+
+        unitSymbol = sp.getString(
+                getActivity().getString(R.string.pref_unit_key),
+                getActivity().getString(R.string.pref_unit_default));
+        ((TextView)v.findViewById(R.id.dollar1)).setText(unitSymbol);
+        ((TextView)v.findViewById(R.id.dollar2)).setText(unitSymbol);
+        ((TextView)v.findViewById(R.id.dollar3)).setText(unitSymbol);
+
+
+        defaultPercentList = sp.getString(
+                getActivity().getString(R.string.pref_percents_key),
+                getActivity().getString(R.string.pref_percents_default));
 
     }
 
@@ -84,6 +109,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         }
 
         setButtons(rootView, rotatePlus, rotateX);
+        setInitialPreferences(rootView);
 
         return rootView;
     }
@@ -207,7 +233,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
                 resetSpinner();
                 tip = 0;
                 total = 0;
-                people = 2;
+                people = defPeople;
                 recalculate = true;
                 if (split_card.isShown())
                     hideCard(rotatePlus);
@@ -230,6 +256,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
                 }
             }
         });
+
 
         Button split_button = (Button) rootView.findViewById(R.id.split_button);
         split_button.setOnClickListener(new View.OnClickListener() {
@@ -263,7 +290,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
                     people--;
                 } else {
                     hideCard(rotatePlus);
-                    people = 2;
+                    people = defPeople;
                 }
                 setPeople();
                 calcSplits();

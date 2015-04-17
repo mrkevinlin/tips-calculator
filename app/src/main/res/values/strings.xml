@@ -28,8 +28,12 @@
     <string name="pref_unit_default" translatable="false">$</string>
 
     <string name="pref_percents_label">Default tip percentages</string>
-    <string name="pref_percents_key">percents</string>
-    <string name="pref_percents_default">15, 18, 20</string>
+    <string name="pref_percents_key" translatable="false">percents</string>
+    <string name="pref_percents_default" translatable="false">15, 18, 20</string>
+
+    <string name="pref_people_label">Initial number of ways to split the check</string>
+    <string name="pref_people_key" translatable="false">people</string>
+    <string name="pref_people_default" translatable="false">2</string>
 
     <string name="general_help_text">Enter in the amount of the sale, and then filling any other
         blank will cause the rest to calculate.</string>
