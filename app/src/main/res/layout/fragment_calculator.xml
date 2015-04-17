@@ -31,6 +31,7 @@
                     <LinearLayout style="@style/CalculatorRows">
 
                         <TextView
+                            android:id="@+id/dollar1"
                             style="@style/DollarTheme"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -56,12 +57,12 @@
 
                     <LinearLayout style="@style/CalculatorRows">
 
-                        <TextView
-                            style="@style/DollarTheme"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/dollar"
-                            android:visibility="invisible" />
+                        <!--<TextView-->
+                            <!--style="@style/DollarTheme"-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:text="@string/dollar"-->
+                            <!--android:visibility="invisible" />-->
                         <!---->
                         <!--<com.rengwuxian.materialedittext.MaterialEditText-->
                         <!--android:id="@+id/percent_amount"-->
@@ -80,8 +81,10 @@
                             android:layout_marginEnd="16dp"
                             android:layout_marginRight="16dp"
                             android:layout_weight="3"
+                            android:dropDownVerticalOffset="-8dp"
                             android:focusable="true"
-                            android:focusableInTouchMode="true" />
+                            android:focusableInTouchMode="true"
+                            android:popupBackground="@color/white"/>
 
                         <!--<TextView-->
                         <!--style="@style/DollarTheme"-->
@@ -92,6 +95,7 @@
                         <!--android:text="@string/pct_text" />-->
 
                         <TextView
+                            android:id="@+id/dollar2"
                             style="@style/DollarTheme"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -111,6 +115,7 @@
                     <LinearLayout style="@style/CalculatorRows">
 
                         <TextView
+                            android:id="@+id/dollar3"
                             style="@style/DollarTheme"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

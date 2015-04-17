@@ -39,10 +39,11 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
     public ArrayAdapter<String> adapter;
     public double sale, percent, tip, total, splitTip, splitTotal;
     public int people = 2;
-    public int percent_array_length;
+    public int percent_array_length, spinnerPosition;
 
     boolean recalculate = true;
     boolean rounding = false;
+
     public CalculatorFragment() {
 
     }
@@ -55,12 +56,6 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         //TODO: Eventually populate from user preference list (use for loop for length of list)
         populatePercentArray();
 
-        spinner = (Spinner) rootView.findViewById(R.id.percent_amount_spinner);
-        adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item, percents);
-        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-        spinner.setOnItemSelectedListener(this);
-
         scroll_view = rootView.findViewById(R.id.scroll_view);
         calculator_card = rootView.findViewById(R.id.calculator_card);
         sale_text = rootView.findViewById(R.id.sale_amount);
@@ -71,6 +66,12 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         people_count = rootView.findViewById(R.id.people_count);
         split_tip = rootView.findViewById(R.id.split_tip);
         split_total = rootView.findViewById(R.id.split_total);
+
+        spinner = (Spinner) rootView.findViewById(R.id.percent_amount_spinner);
+        adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item, percents);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(this);
 
         setCalcListeners();
 
@@ -334,21 +335,34 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
 
     public void addPercentToSpinner(double p) {
 
-        if (p == 0 && percents.size()==percent_array_length) {
-            resetSpinner();
-        } else if (p != 0) {
-
+//        if (p == 0 && percents.size()==percent_array_length) {
+//            resetSpinner();
+//        } else if (p != 0) {
+//
+//            if (percents.size() > percent_array_length) {
+//                percents.remove(percents.size() - 1);
+//            }
+//            percents.add(String.format("%.1f", p) + "%");
+//            spinner.setAdapter(adapter);
+//            spinner.setSelection(percents.size() - 1);
+//
+//        } else {
+//            spinner.setAdapter(adapter);
+//            spinner.setSelection(percents.size() - 1);
+//        }
+        rounding = true;
+        spinner.setAdapter(adapter);
+        if (p == 0) {
+            spinner.setSelection(spinnerPosition);
+        } else {
             if (percents.size() > percent_array_length) {
                 percents.remove(percents.size() - 1);
             }
             percents.add(String.format("%.1f", p) + "%");
-            spinner.setAdapter(adapter);
             spinner.setSelection(percents.size() - 1);
-
-        } else {
-            spinner.setAdapter(adapter);
-            spinner.setSelection(percents.size() - 1);
+            spinnerPosition = percents.size() - 1;
         }
+        rounding = false;
     }
 
     private void showPercentDialog() {
@@ -373,6 +387,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
             try {
                 percent = Double.parseDouble(percent_number);
                 percentChanged();
+                spinnerPosition = position;
             } catch (NumberFormatException e) {
                 if (percent_number.equals("Custo")) {
                     showPercentDialog();

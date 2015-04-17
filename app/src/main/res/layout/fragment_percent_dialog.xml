@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="end"
-            android:inputType="number"
+            android:inputType="numberDecimal"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
             android:textCursorDrawable="@drawable/color_cursor"

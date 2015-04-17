@@ -3,8 +3,6 @@
 
     <string name="dollar">$</string>
     <string name="sale_text">Sale</string>
-    <string name="tip_pct_text">Pct</string>
-    <string name="pct_text">%</string>
     <string name="tip_amt_text">Tip</string>
     <string name="total_text">Total</string>
     <string name="action_about">Help and feedback</string>
@@ -22,6 +20,16 @@
     <string name="people">\u0020people</string>
     <string name="per_person">\u0020per person</string>
     <string name="tip_per">\u0020from tips</string>
+
+    <string name="settings_text">Settings</string>
+
+    <string name="pref_unit_label">Unit of currency</string>
+    <string name="pref_unit_key" translatable="false">units</string>
+    <string name="pref_unit_default" translatable="false">$</string>
+
+    <string name="pref_percents_label">Default tip percentages</string>
+    <string name="pref_percents_key">percents</string>
+    <string name="pref_percents_default">15, 18, 20</string>
 
     <string name="general_help_text">Enter in the amount of the sale, and then filling any other
         blank will cause the rest to calculate.</string>

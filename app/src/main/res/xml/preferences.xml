@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_unit_default"
+        android:dialogMessage="Only one character used!"
+        android:dialogTitle="Pick a unit of currency"
+        android:inputType="text"
+        android:key="@string/pref_unit_key"
+        android:maxLength="3"
+        android:singleLine="true"
+        android:title="@string/pref_unit_label" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_percents_default"
+        android:dialogMessage="List numbers separated by commas"
+        android:dialogTitle="Choose the default % values"
+        android:inputType="numberDecimal"
+        android:key="@string/pref_percents_key"
+        android:singleLine="true"
+        android:title="@string/pref_percents_label" />
+
+</PreferenceScreen>

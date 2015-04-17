@@ -23,6 +23,12 @@
             android:label="@string/action_about"
             android:screenOrientation="portrait"
             android:parentActivityName="com.scepticallistic.kevin.tipcalc.MainActivity" />
+
+        <activity
+            android:name="com.scepticallistic.kevin.tipcalc.SettingsActivity"
+            android:label="@string/settings_text"
+            android:screenOrientation="portrait"
+            android:parentActivityName="com.scepticallistic.kevin.tipcalc.MainActivity" />
     </application>
 
 </manifest>
