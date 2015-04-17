@@ -29,7 +29,7 @@
 
     <string name="pref_percents_label">Default tip percentages</string>
     <string name="pref_percents_key" translatable="false">percents</string>
-    <string name="pref_percents_default" translatable="false">15, 18, 20</string>
+    <string name="pref_percents_default" translatable="false">15,18,20</string>
 
     <string name="pref_people_label">Initial number of ways to split the check</string>
     <string name="pref_people_key" translatable="false">people</string>

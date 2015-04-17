@@ -32,16 +32,18 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
-public class CalculatorFragment extends Fragment implements AdapterView.OnItemSelectedListener, PercentDialogFragment.PercentDialogListener, SharedPreferences.OnSharedPreferenceChangeListener {
+public class CalculatorFragment extends Fragment implements AdapterView.OnItemSelectedListener, PercentDialogFragment.PercentDialogListener {
     private static final String LOG_TAG = CalculatorFragment.class.getSimpleName();
     private static final ArrayList<String> percents = new ArrayList<>();
+    private static final ArrayList<String> defPercents = new ArrayList<>();
     public View scroll_view, calculator_card, sale_text, tip_text, total_text, fab_plus, split_card, people_count, split_tip, split_total, unit1, unit2, unit3;
     public Spinner spinner;
     public ArrayAdapter<String> adapter;
     public double sale, percent, tip, total, splitTip, splitTotal;
     public int people, defPeople, percent_array_length, spinnerPosition;
-    public String unitSymbol, defaultPercentList;
+    public String unitSymbol, defaultPercentString;
 
     boolean recalculate = true;
     boolean rounding = false;
@@ -54,23 +56,35 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         defPeople = Integer.parseInt(sp.getString(
-                        getActivity().getString(R.string.pref_people_key),
-                        getActivity().getString(R.string.pref_people_default)));
+                getActivity().getString(R.string.pref_people_key),
+                getActivity().getString(R.string.pref_people_default)));
         people = defPeople;
 
 
         unitSymbol = sp.getString(
                 getActivity().getString(R.string.pref_unit_key),
                 getActivity().getString(R.string.pref_unit_default));
-        ((TextView)v.findViewById(R.id.dollar1)).setText(unitSymbol);
-        ((TextView)v.findViewById(R.id.dollar2)).setText(unitSymbol);
-        ((TextView)v.findViewById(R.id.dollar3)).setText(unitSymbol);
+        ((TextView) v.findViewById(R.id.dollar1)).setText(unitSymbol);
+        ((TextView) v.findViewById(R.id.dollar2)).setText(unitSymbol);
+        ((TextView) v.findViewById(R.id.dollar3)).setText(unitSymbol);
 
-
-        defaultPercentList = sp.getString(
+        defPercents.clear();
+        defaultPercentString = sp.getString(
                 getActivity().getString(R.string.pref_percents_key),
                 getActivity().getString(R.string.pref_percents_default));
 
+        while (defaultPercentString.contains(",")) {
+            defPercents.add(defaultPercentString.substring(0, defaultPercentString.indexOf(",")) + "%");
+            defaultPercentString = defaultPercentString.substring(defaultPercentString.indexOf(",") + 1);
+        }
+        if (!defaultPercentString.isEmpty()) {
+            defPercents.add(defaultPercentString + "%");
+        }
+        defPercents.add("Custom");
+        Collections.sort(defPercents);
+
+        percent_array_length = defPercents.size();
+        //TODO: Set percents = defPercents
     }
 
     @Override
@@ -78,8 +92,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
 
         View rootView = inflater.inflate(R.layout.fragment_calculator, container, false);
 
-        //TODO: Eventually populate from user preference list (use for loop for length of list)
-        populatePercentArray();
+        setInitialPreferences(rootView);
 
         scroll_view = rootView.findViewById(R.id.scroll_view);
         calculator_card = rootView.findViewById(R.id.calculator_card);
@@ -109,17 +122,8 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         }
 
         setButtons(rootView, rotatePlus, rotateX);
-        setInitialPreferences(rootView);
 
         return rootView;
-    }
-
-    private void populatePercentArray() {
-        percents.add("15%");
-        percents.add("18%");
-        percents.add("20%");
-        percents.add("Custom");
-        percent_array_length = percents.size();
     }
 
     private void setCalcListeners() {
@@ -361,22 +365,6 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
     }
 
     public void addPercentToSpinner(double p) {
-
-//        if (p == 0 && percents.size()==percent_array_length) {
-//            resetSpinner();
-//        } else if (p != 0) {
-//
-//            if (percents.size() > percent_array_length) {
-//                percents.remove(percents.size() - 1);
-//            }
-//            percents.add(String.format("%.1f", p) + "%");
-//            spinner.setAdapter(adapter);
-//            spinner.setSelection(percents.size() - 1);
-//
-//        } else {
-//            spinner.setAdapter(adapter);
-//            spinner.setSelection(percents.size() - 1);
-//        }
         rounding = true;
         spinner.setAdapter(adapter);
         if (p == 0) {
@@ -401,7 +389,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
 
     public void resetSpinner() {
         percents.clear();
-        populatePercentArray();
+//TODO: Set percents = defPercents
         spinner.setSelection(0);
         spinner.setAdapter(adapter);
     }
