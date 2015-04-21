@@ -1,5 +1,10 @@
 <resources>
 
+    <style name="PercentSpinner">
+        <item name="android:dropDownVerticalOffset">-8dp</item>
+        <item name="android:popupBackground">@color/white</item>
+    </style>
+
     <style name="FunctionButton" parent="@android:style/Widget.Material.Button.Borderless">
     </style>
 

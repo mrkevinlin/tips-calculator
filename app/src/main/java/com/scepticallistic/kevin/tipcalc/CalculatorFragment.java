@@ -38,13 +38,12 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
     private static final String LOG_TAG = CalculatorFragment.class.getSimpleName();
     private static final ArrayList<String> percents = new ArrayList<>();
     private static final ArrayList<String> defPercents = new ArrayList<>();
-    public View scroll_view, calculator_card, sale_text, tip_text, total_text, fab_plus, split_card, people_count, split_tip, split_total, unit1, unit2, unit3;
+    public View scroll_view, calculator_card, sale_text, tip_text, total_text, fab_plus, split_card, people_count, split_tip, split_total;
     public Spinner spinner;
     public ArrayAdapter<String> adapter;
     public double sale, percent, tip, total, splitTip, splitTotal;
     public int people, defPeople, percent_array_length, spinnerPosition;
-    public String unitSymbol, defaultPercentString;
-
+    public String prefUnitKey, prefPeopleKey, prefPercentsKey, unitSymbol, defaultPercentString;
     boolean recalculate = true;
     boolean rounding = false;
 
@@ -52,26 +51,28 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
 
     }
 
-    private void setInitialPreferences(View v) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
+    private void setPeoplePreference(SharedPreferences sp) {
         defPeople = Integer.parseInt(sp.getString(
-                getActivity().getString(R.string.pref_people_key),
-                getActivity().getString(R.string.pref_people_default)));
+                getString(R.string.pref_people_key),
+                getString(R.string.pref_people_default)));
         people = defPeople;
+    }
 
-
+    public void setUnitPreference(SharedPreferences sp, View v) {
         unitSymbol = sp.getString(
-                getActivity().getString(R.string.pref_unit_key),
-                getActivity().getString(R.string.pref_unit_default));
+                getString(R.string.pref_unit_key),
+                getString(R.string.pref_unit_default));
         ((TextView) v.findViewById(R.id.dollar1)).setText(unitSymbol);
         ((TextView) v.findViewById(R.id.dollar2)).setText(unitSymbol);
         ((TextView) v.findViewById(R.id.dollar3)).setText(unitSymbol);
+    }
 
+    private void setSpinnerPreferences(SharedPreferences sp) {
         defPercents.clear();
+        percents.clear();
         defaultPercentString = sp.getString(
-                getActivity().getString(R.string.pref_percents_key),
-                getActivity().getString(R.string.pref_percents_default));
+                getString(R.string.pref_percents_key),
+                getString(R.string.pref_percents_default));
 
         while (defaultPercentString.contains(",")) {
             defPercents.add(defaultPercentString.substring(0, defaultPercentString.indexOf(",")) + "%");
@@ -84,7 +85,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         Collections.sort(defPercents);
 
         percent_array_length = defPercents.size();
-        //TODO: Set percents = defPercents
+        percents.addAll(defPercents);
     }
 
     @Override
@@ -92,7 +93,28 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
 
         View rootView = inflater.inflate(R.layout.fragment_calculator, container, false);
 
-        setInitialPreferences(rootView);
+        prefUnitKey = getActivity().getString(R.string.pref_unit_key);
+        prefPeopleKey = getActivity().getString(R.string.pref_people_key);
+        prefPercentsKey = getActivity().getString(R.string.pref_percents_key);
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        setUnitPreference(preferences, rootView);
+        setSpinnerPreferences(preferences);
+        setPeoplePreference(preferences);
+
+        SharedPreferences.OnSharedPreferenceChangeListener prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                if (key.equals(prefPeopleKey)) {
+                    setPeoplePreference(sharedPreferences);
+                } else if (key.equals(prefPercentsKey)) {
+                    setSpinnerPreferences(sharedPreferences);}
+//                } else if (key.equals(prefUnitKey)) {
+//                    setUnitPreference(sharedPreferences);
+//                }
+            }
+        };
+        preferences.registerOnSharedPreferenceChangeListener(prefListener);
 
         scroll_view = rootView.findViewById(R.id.scroll_view);
         calculator_card = rootView.findViewById(R.id.calculator_card);
@@ -108,6 +130,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         spinner = (Spinner) rootView.findViewById(R.id.percent_amount_spinner);
         adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item, percents);
         adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        spinner.setSelection(0);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
 
@@ -160,7 +183,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
                 if (actionId == EditorInfo.IME_ACTION_NEXT) {
                     hideKeyboard();
                     sale_view.clearFocus();
-//                    spinner.requestFocus();
+                    spinner.requestFocus();
                     spinner.performClick();
                 }
                 return true;
@@ -389,7 +412,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
 
     public void resetSpinner() {
         percents.clear();
-//TODO: Set percents = defPercents
+        percents.addAll(defPercents);
         spinner.setSelection(0);
         spinner.setAdapter(adapter);
     }
@@ -507,5 +530,4 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         super.onDestroy();
         percents.clear();
     }
-
 }
