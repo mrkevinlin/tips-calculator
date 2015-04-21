@@ -44,65 +44,11 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
     public ArrayAdapter<String> adapter;
     public double sale, percent, tip, total, splitTip, splitTotal;
     public int people, defPeople, percent_array_length, spinnerPosition;
-    public String prefUnitKey, prefPeopleKey, prefPercentsKey, unitSymbol, defaultPercentString, addPercentString;
+    public String prefUnitKey, prefPeopleKey, prefPercentsKey, unitSymbol, peoplePref, defaultPercentString, addPercentString;
     boolean recalculate = true;
     boolean rounding = false;
 
-    public CalculatorFragment() {
-
-    }
-
-    private void setPeoplePreference(SharedPreferences sp) {
-        defPeople = Integer.parseInt(sp.getString(
-                main.getString(R.string.pref_people_key),
-                main.getString(R.string.pref_people_default)));
-        people = defPeople;
-    }
-
-    public void setUnitPreference(SharedPreferences sp) {
-        unitSymbol = sp.getString(
-                main.getString(R.string.pref_unit_key),
-                main.getString(R.string.pref_unit_default));
-        ((TextView) rootView.findViewById(R.id.dollar1)).setText(unitSymbol);
-        ((TextView) rootView.findViewById(R.id.dollar2)).setText(unitSymbol);
-        ((TextView) rootView.findViewById(R.id.dollar3)).setText(unitSymbol);
-    }
-
-    private void setSpinnerPreferences(SharedPreferences sp) {
-        defPercents.clear();
-        percents.clear();
-        defaultPercentString = sp.getString(
-                main.getString(R.string.pref_percents_key),
-                main.getString(R.string.pref_percents_default));
-
-        // If user did not enter in any valid numbers, resort to default.
-        if (!defaultPercentString.matches(".*\\d.*")) {
-            defaultPercentString = main.getString(R.string.pref_percents_default);
-        }
-
-        while (defaultPercentString.contains(",") && defaultPercentString.matches(".*\\d.*")) {
-
-            addPercentString = defaultPercentString.substring(0, defaultPercentString.indexOf(","));
-
-            if (addPercentString.matches("\\d+")) {
-                defPercents.add(addPercentString + "%");
-            }
-            defaultPercentString = defaultPercentString.substring(defaultPercentString.indexOf(",") + 1);
-
-        }
-        
-        // Adding in the last number that is not bordered by a comma.
-        if (!defaultPercentString.isEmpty() && defaultPercentString.matches("\\d+")) {
-            defPercents.add(defaultPercentString + "%");
-        }
-        defPercents.add("Custom");
-//        Collections.sort(defPercents);
-
-        percent_array_length = defPercents.size();
-        percents.addAll(defPercents);
-        spinner.setSelection(0);
-        spinner.setAdapter(adapter);
-    }
+    public CalculatorFragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -166,6 +112,62 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         setButtons(rootView, rotatePlus, rotateX);
 
         return rootView;
+    }
+
+    private void setPeoplePreference(SharedPreferences sp) {
+        peoplePref = sp.getString(
+                main.getString(R.string.pref_people_key),
+                main.getString(R.string.pref_people_default));
+        if (!peoplePref.matches("\\d+") || Integer.parseInt(peoplePref) < 2) {
+            peoplePref = main.getString(R.string.pref_people_default);
+        }
+        defPeople = Integer.parseInt(peoplePref);
+        people = defPeople;
+    }
+
+    public void setUnitPreference(SharedPreferences sp) {
+        unitSymbol = sp.getString(
+                main.getString(R.string.pref_unit_key),
+                main.getString(R.string.pref_unit_default));
+        ((TextView) rootView.findViewById(R.id.dollar1)).setText(unitSymbol);
+        ((TextView) rootView.findViewById(R.id.dollar2)).setText(unitSymbol);
+        ((TextView) rootView.findViewById(R.id.dollar3)).setText(unitSymbol);
+    }
+
+    private void setSpinnerPreferences(SharedPreferences sp) {
+        defPercents.clear();
+        percents.clear();
+        defaultPercentString = sp.getString(
+                main.getString(R.string.pref_percents_key),
+                main.getString(R.string.pref_percents_default));
+
+        // If user did not enter in any valid numbers, resort to default.
+        if (!defaultPercentString.matches(".*\\d.*")) {
+            defaultPercentString = main.getString(R.string.pref_percents_default);
+        }
+
+        while (defaultPercentString.contains(",") && defaultPercentString.matches(".*\\d.*")) {
+
+            addPercentString = defaultPercentString.substring(0, defaultPercentString.indexOf(","));
+
+            if (addPercentString.matches("\\d+")) {
+                defPercents.add(addPercentString + "%");
+            }
+            defaultPercentString = defaultPercentString.substring(defaultPercentString.indexOf(",") + 1);
+
+        }
+
+        // Adding in the last number that is not bordered by a comma.
+        if (!defaultPercentString.isEmpty() && defaultPercentString.matches("\\d+")) {
+            defPercents.add(defaultPercentString + "%");
+        }
+        defPercents.add("Custom");
+//        Collections.sort(defPercents);
+
+        percent_array_length = defPercents.size();
+        percents.addAll(defPercents);
+        spinner.setSelection(0);
+        spinner.setAdapter(adapter);
     }
 
     private void setCalcListeners() {
@@ -344,66 +346,30 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         });
     }
 
-    @TargetApi(21) // Remove the drop shadow from the + drawable
-    private void removeFABPlusOutline(View plusView) {
-        ViewOutlineProvider viewOutlineProvider = new ViewOutlineProvider() {
-            @Override
-            public void getOutline(View view, Outline outline) {
-                view.setOutlineProvider(null);
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        if (recalculate && !rounding) {
+            String percent_number = parent.getItemAtPosition(position).toString();
+            percent_number = percent_number.substring(0, percent_number.length() - 1);
+            try {
+                percent = Double.parseDouble(percent_number);
+                percentChanged();
+                spinnerPosition = position;
+                // Remove messy recalculated or custom percentages upon selection of default ones.
+                if (percents.size() > percent_array_length) {
+                    percents.remove(percents.size()-1);
+                }
+            } catch (NumberFormatException e) {
+                if (percent_number.equals("Custo")) {
+                    showPercentDialog();
+                }
             }
-        };
-        plusView.setOutlineProvider(viewOutlineProvider);
+        }
+        rounding = false;
     }
 
-    @TargetApi(21) // Material ripple to clear the card
-    private void clearReveal(Button source) {
-        LinearLayout.LayoutParams shift = (LinearLayout.LayoutParams) calculator_card.getLayoutParams();
-
-        int centerX = ((source.getLeft() + source.getRight()) / 2)
-                + shift.leftMargin;
-        int centerY = (calculator_card.getBottom() - (source.getHeight() / 2))
-                - (shift.topMargin + calculator_card.getPaddingBottom());
-        int radius = (int) Math.sqrt(Math.pow(calculator_card.getWidth(), 2) + Math.pow(calculator_card.getHeight(), 2));
-
-        Animator reveal = ViewAnimationUtils.createCircularReveal(
-                calculator_card,
-                centerX,
-                centerY,
-                0,
-                radius);
-        reveal.setDuration(400);
-        reveal.start();
-    }
-
-    private void showCard(Animation animation) {
-        fab_plus.startAnimation(animation);
-        split_card.setVisibility(View.VISIBLE);
-        split_card.animate().alpha(1f).translationY(0f).setDuration(200).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                ((ScrollView) scroll_view).smoothScrollTo(0, split_card.getBottom());
-            }
-        });
-        setPeople();
-        calcSplits();
-    }
-
-    private void hideCard(Animation animation) {
-        fab_plus.startAnimation(animation);
-        split_card.animate().alpha(0f).translationY(-100f).setDuration(200).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                super.onAnimationStart(animation);
-                ((ScrollView) scroll_view).smoothScrollTo(0, 0);
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                split_card.setVisibility(View.GONE);
-            }
-        });
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
     }
 
     public void addPercentToSpinner(double p) {
@@ -434,32 +400,6 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         percents.addAll(defPercents);
         spinner.setSelection(0);
         spinner.setAdapter(adapter);
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        if (recalculate && !rounding) {
-            String percent_number = parent.getItemAtPosition(position).toString();
-            percent_number = percent_number.substring(0, percent_number.length() - 1);
-            try {
-                percent = Double.parseDouble(percent_number);
-                percentChanged();
-                spinnerPosition = position;
-                // Remove messy recalculated or custom percentages upon selection of default ones.
-                if (percents.size() > percent_array_length) {
-                    percents.remove(percents.size()-1);
-                }
-            } catch (NumberFormatException e) {
-                if (percent_number.equals("Custo")) {
-                    showPercentDialog();
-                }
-            }
-        }
-        rounding = false;
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
     }
 
     private void saleChanged() {
@@ -540,6 +480,68 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
 
         ((TextView) split_tip).setText(unitSymbol + String.format("%.2f", splitTip));
         ((TextView) split_total).setText(unitSymbol + String.format("%.2f", splitTotal));
+    }
+
+    @TargetApi(21) // Remove the drop shadow from the + drawable
+    private void removeFABPlusOutline(View plusView) {
+        ViewOutlineProvider viewOutlineProvider = new ViewOutlineProvider() {
+            @Override
+            public void getOutline(View view, Outline outline) {
+                view.setOutlineProvider(null);
+            }
+        };
+        plusView.setOutlineProvider(viewOutlineProvider);
+    }
+
+    @TargetApi(21) // Material ripple to clear the card
+    private void clearReveal(Button source) {
+        LinearLayout.LayoutParams shift = (LinearLayout.LayoutParams) calculator_card.getLayoutParams();
+
+        int centerX = ((source.getLeft() + source.getRight()) / 2)
+                + shift.leftMargin;
+        int centerY = (calculator_card.getBottom() - (source.getHeight() / 2))
+                - (shift.topMargin + calculator_card.getPaddingBottom());
+        int radius = (int) Math.sqrt(Math.pow(calculator_card.getWidth(), 2) + Math.pow(calculator_card.getHeight(), 2));
+
+        Animator reveal = ViewAnimationUtils.createCircularReveal(
+                calculator_card,
+                centerX,
+                centerY,
+                0,
+                radius);
+        reveal.setDuration(400);
+        reveal.start();
+    }
+
+    private void showCard(Animation animation) {
+        fab_plus.startAnimation(animation);
+        split_card.setVisibility(View.VISIBLE);
+        split_card.animate().alpha(1f).translationY(0f).setDuration(200).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                ((ScrollView) scroll_view).smoothScrollTo(0, split_card.getBottom());
+            }
+        });
+        setPeople();
+        calcSplits();
+    }
+
+    private void hideCard(Animation animation) {
+        fab_plus.startAnimation(animation);
+        split_card.animate().alpha(0f).translationY(-100f).setDuration(200).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                ((ScrollView) scroll_view).smoothScrollTo(0, 0);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                split_card.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void hideKeyboard() {

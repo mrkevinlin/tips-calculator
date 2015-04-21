@@ -13,7 +13,7 @@
 
     <EditTextPreference
         android:defaultValue="@string/pref_percents_default"
-        android:dialogMessage="List numbers separated by commas. \nThe first number is the default selected."
+        android:dialogMessage="List numbers separated by commas. \nThe first number selected by default."
         android:dialogTitle="Choose the default % values"
         android:digits="0123456789,"
         android:inputType="numberDecimal"
@@ -23,6 +23,7 @@
 
     <EditTextPreference
         android:defaultValue="@string/pref_people_default"
+        android:dialogMessage="Anything below 2 will set the number to 2."
         android:dialogTitle="How many people?"
         android:inputType="number"
         android:key="@string/pref_people_key"
