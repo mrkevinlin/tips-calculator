@@ -33,7 +33,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class CalculatorFragment extends Fragment implements AdapterView.OnItemSelectedListener, PercentDialogFragment.PercentDialogListener {
     private static final String LOG_TAG = CalculatorFragment.class.getSimpleName();
@@ -45,7 +44,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
     public ArrayAdapter<String> adapter;
     public double sale, percent, tip, total, splitTip, splitTotal;
     public int people, defPeople, percent_array_length, spinnerPosition;
-    public String prefUnitKey, prefPeopleKey, prefPercentsKey, unitSymbol, defaultPercentString;
+    public String prefUnitKey, prefPeopleKey, prefPercentsKey, unitSymbol, defaultPercentString, addPercentString;
     boolean recalculate = true;
     boolean rounding = false;
 
@@ -76,18 +75,33 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
                 main.getString(R.string.pref_percents_key),
                 main.getString(R.string.pref_percents_default));
 
-        while (defaultPercentString.contains(",")) {
-            defPercents.add(defaultPercentString.substring(0, defaultPercentString.indexOf(",")) + "%");
-            defaultPercentString = defaultPercentString.substring(defaultPercentString.indexOf(",") + 1);
+        // If user did not enter in any valid numbers, resort to default.
+        if (!defaultPercentString.matches(".*\\d.*")) {
+            defaultPercentString = main.getString(R.string.pref_percents_default);
         }
-        if (!defaultPercentString.isEmpty()) {
+
+        while (defaultPercentString.contains(",") && defaultPercentString.matches(".*\\d.*")) {
+
+            addPercentString = defaultPercentString.substring(0, defaultPercentString.indexOf(","));
+
+            if (addPercentString.matches("\\d+")) {
+                defPercents.add(addPercentString + "%");
+            }
+            defaultPercentString = defaultPercentString.substring(defaultPercentString.indexOf(",") + 1);
+
+        }
+        
+        // Adding in the last number that is not bordered by a comma.
+        if (!defaultPercentString.isEmpty() && defaultPercentString.matches("\\d+")) {
             defPercents.add(defaultPercentString + "%");
         }
         defPercents.add("Custom");
-        Collections.sort(defPercents);
+//        Collections.sort(defPercents);
 
         percent_array_length = defPercents.size();
         percents.addAll(defPercents);
+        spinner.setSelection(0);
+        spinner.setAdapter(adapter);
     }
 
     @Override
@@ -100,6 +114,9 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         prefUnitKey = main.getString(R.string.pref_unit_key);
         prefPeopleKey = main.getString(R.string.pref_people_key);
         prefPercentsKey = main.getString(R.string.pref_percents_key);
+
+        spinner = (Spinner) rootView.findViewById(R.id.percent_amount_spinner);
+        adapter = new ArrayAdapter<>(main, R.layout.spinner_item, percents);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(main);
         setUnitPreference(preferences);
@@ -131,8 +148,6 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         split_tip = rootView.findViewById(R.id.split_tip);
         split_total = rootView.findViewById(R.id.split_total);
 
-        spinner = (Spinner) rootView.findViewById(R.id.percent_amount_spinner);
-        adapter = new ArrayAdapter<>(main, R.layout.spinner_item, percents);
         adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         spinner.setSelection(0);
         spinner.setAdapter(adapter);
