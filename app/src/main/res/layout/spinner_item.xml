@@ -3,7 +3,7 @@
     android:id="@+id/spinner_item"
     android:gravity="center"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:textColor="@color/gray"
     android:textSize="24sp">

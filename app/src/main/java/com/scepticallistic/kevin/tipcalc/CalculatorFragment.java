@@ -44,6 +44,8 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
     public ArrayAdapter<String> adapter;
     public double sale, percent, tip, total, splitTip, splitTotal;
     public int people, defPeople, percent_array_length, spinnerPosition;
+    public SharedPreferences preferences;
+    public SharedPreferences.OnSharedPreferenceChangeListener prefListener;
     public String prefUnitKey, prefPeopleKey, prefPercentsKey, unitSymbol, peoplePref, defaultPercentString, addPercentString;
     boolean recalculate = true;
     boolean rounding = false;
@@ -64,12 +66,12 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         spinner = (Spinner) rootView.findViewById(R.id.percent_amount_spinner);
         adapter = new ArrayAdapter<>(main, R.layout.spinner_item, percents);
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(main);
+        preferences = PreferenceManager.getDefaultSharedPreferences(main);
         setUnitPreference(preferences);
         setSpinnerPreferences(preferences);
         setPeoplePreference(preferences);
 
-        SharedPreferences.OnSharedPreferenceChangeListener prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 if (key.equals(prefPeopleKey)) {
@@ -552,7 +554,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
-        percents.clear();
+        super.onPause();
+        preferences.unregisterOnSharedPreferenceChangeListener(prefListener);
     }
 }

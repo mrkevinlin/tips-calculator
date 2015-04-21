@@ -61,7 +61,7 @@
                             android:id="@+id/percent_amount_spinner"
                             style="@style/PercentSpinner"
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
+                            android:layout_height="48dp"
                             android:layout_marginEnd="16dp"
                             android:layout_marginRight="16dp"
                             android:layout_weight="3"
