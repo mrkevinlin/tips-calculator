@@ -3,6 +3,7 @@ package com.scepticallistic.kevin.tipcalc;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Outline;
@@ -38,7 +39,8 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
     private static final String LOG_TAG = CalculatorFragment.class.getSimpleName();
     private static final ArrayList<String> percents = new ArrayList<>();
     private static final ArrayList<String> defPercents = new ArrayList<>();
-    public View scroll_view, calculator_card, sale_text, tip_text, total_text, fab_plus, split_card, people_count, split_tip, split_total;
+    public Activity main;
+    public View rootView, scroll_view, calculator_card, sale_text, tip_text, total_text, fab_plus, split_card, people_count, split_tip, split_total;
     public Spinner spinner;
     public ArrayAdapter<String> adapter;
     public double sale, percent, tip, total, splitTip, splitTotal;
@@ -53,26 +55,26 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
 
     private void setPeoplePreference(SharedPreferences sp) {
         defPeople = Integer.parseInt(sp.getString(
-                getString(R.string.pref_people_key),
-                getString(R.string.pref_people_default)));
+                main.getString(R.string.pref_people_key),
+                main.getString(R.string.pref_people_default)));
         people = defPeople;
     }
 
-    public void setUnitPreference(SharedPreferences sp, View v) {
+    public void setUnitPreference(SharedPreferences sp) {
         unitSymbol = sp.getString(
-                getString(R.string.pref_unit_key),
-                getString(R.string.pref_unit_default));
-        ((TextView) v.findViewById(R.id.dollar1)).setText(unitSymbol);
-        ((TextView) v.findViewById(R.id.dollar2)).setText(unitSymbol);
-        ((TextView) v.findViewById(R.id.dollar3)).setText(unitSymbol);
+                main.getString(R.string.pref_unit_key),
+                main.getString(R.string.pref_unit_default));
+        ((TextView) rootView.findViewById(R.id.dollar1)).setText(unitSymbol);
+        ((TextView) rootView.findViewById(R.id.dollar2)).setText(unitSymbol);
+        ((TextView) rootView.findViewById(R.id.dollar3)).setText(unitSymbol);
     }
 
     private void setSpinnerPreferences(SharedPreferences sp) {
         defPercents.clear();
         percents.clear();
         defaultPercentString = sp.getString(
-                getString(R.string.pref_percents_key),
-                getString(R.string.pref_percents_default));
+                main.getString(R.string.pref_percents_key),
+                main.getString(R.string.pref_percents_default));
 
         while (defaultPercentString.contains(",")) {
             defPercents.add(defaultPercentString.substring(0, defaultPercentString.indexOf(",")) + "%");
@@ -91,14 +93,16 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.fragment_calculator, container, false);
+        main = getActivity();
 
-        prefUnitKey = getActivity().getString(R.string.pref_unit_key);
-        prefPeopleKey = getActivity().getString(R.string.pref_people_key);
-        prefPercentsKey = getActivity().getString(R.string.pref_percents_key);
+        rootView = inflater.inflate(R.layout.fragment_calculator, container, false);
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        setUnitPreference(preferences, rootView);
+        prefUnitKey = main.getString(R.string.pref_unit_key);
+        prefPeopleKey = main.getString(R.string.pref_people_key);
+        prefPercentsKey = main.getString(R.string.pref_percents_key);
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(main);
+        setUnitPreference(preferences);
         setSpinnerPreferences(preferences);
         setPeoplePreference(preferences);
 
@@ -107,11 +111,11 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 if (key.equals(prefPeopleKey)) {
                     setPeoplePreference(sharedPreferences);
+                } else if (key.equals(prefUnitKey)) {
+                    setUnitPreference(sharedPreferences);
                 } else if (key.equals(prefPercentsKey)) {
-                    setSpinnerPreferences(sharedPreferences);}
-//                } else if (key.equals(prefUnitKey)) {
-//                    setUnitPreference(sharedPreferences);
-//                }
+                    setSpinnerPreferences(sharedPreferences);
+                }
             }
         };
         preferences.registerOnSharedPreferenceChangeListener(prefListener);
@@ -128,7 +132,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         split_total = rootView.findViewById(R.id.split_total);
 
         spinner = (Spinner) rootView.findViewById(R.id.percent_amount_spinner);
-        adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_item, percents);
+        adapter = new ArrayAdapter<>(main, R.layout.spinner_item, percents);
         adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         spinner.setSelection(0);
         spinner.setAdapter(adapter);
@@ -136,8 +140,8 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
 
         setCalcListeners();
 
-        Animation rotateX = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_rotate_to_x);
-        Animation rotatePlus = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_rotate_to_plus);
+        Animation rotateX = AnimationUtils.loadAnimation(main, R.anim.fab_rotate_to_x);
+        Animation rotatePlus = AnimationUtils.loadAnimation(main, R.anim.fab_rotate_to_plus);
 
         split_card.animate().alpha(0f).translationY(-100f);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -426,6 +430,10 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
                 percent = Double.parseDouble(percent_number);
                 percentChanged();
                 spinnerPosition = position;
+                // Remove messy recalculated or custom percentages upon selection of default ones.
+                if (percents.size() > percent_array_length) {
+                    percents.remove(percents.size()-1);
+                }
             } catch (NumberFormatException e) {
                 if (percent_number.equals("Custo")) {
                     showPercentDialog();
@@ -515,13 +523,13 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         splitTip = tip / people;
         splitTotal = total / people;
 
-        ((TextView) split_tip).setText("$" + String.format("%.2f", splitTip));
-        ((TextView) split_total).setText("$" + String.format("%.2f", splitTotal));
+        ((TextView) split_tip).setText(unitSymbol + String.format("%.2f", splitTip));
+        ((TextView) split_total).setText(unitSymbol + String.format("%.2f", splitTotal));
     }
 
     private void hideKeyboard() {
-        InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
+        InputMethodManager inputManager = (InputMethodManager) main.getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(main.getCurrentFocus().getWindowToken(),
                 InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
