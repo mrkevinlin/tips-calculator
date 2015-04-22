@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.AppCompatSpinner;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -29,7 +30,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
     private static final ArrayList<String> defPercents = new ArrayList<>();
     public Activity main;
     public View rootView, scroll_view, calculator_card, sale_text, tip_text, total_text, fab_plus, split_card, people_count, split_tip, split_total;
-    public Spinner spinner;
+    public AppCompatSpinner spinner;
     public ArrayAdapter<String> adapter;
     public double sale, percent, tip, total, splitTip, splitTotal;
     public int people, defPeople, percent_array_length, spinnerPosition;
@@ -50,7 +50,8 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
     boolean recalculate = true;
     boolean rounding = false;
 
-    public CalculatorFragment() {}
+    public CalculatorFragment() {
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -63,7 +64,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         prefPeopleKey = main.getString(R.string.pref_people_key);
         prefPercentsKey = main.getString(R.string.pref_percents_key);
 
-        spinner = (Spinner) rootView.findViewById(R.id.percent_amount_spinner);
+        spinner = (AppCompatSpinner) rootView.findViewById(R.id.percent_amount_spinner);
         adapter = new ArrayAdapter<>(main, R.layout.spinner_item, percents);
 
         preferences = PreferenceManager.getDefaultSharedPreferences(main);
@@ -359,7 +360,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
                 spinnerPosition = position;
                 // Remove messy recalculated or custom percentages upon selection of default ones.
                 if (percents.size() > percent_array_length) {
-                    percents.remove(percents.size()-1);
+                    percents.remove(percents.size() - 1);
                 }
             } catch (NumberFormatException e) {
                 if (percent_number.equals("Custo")) {

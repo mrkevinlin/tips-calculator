@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+            <android.support.v7.widget.CardView
                 android:id="@+id/calculator_card"
                 style="@style/CardStyle"
                 android:layout_marginTop="8dp">
@@ -57,7 +57,7 @@
 
                     <LinearLayout style="@style/CalculatorRows">
 
-                        <Spinner
+                        <android.support.v7.widget.AppCompatSpinner
                             android:id="@+id/percent_amount_spinner"
                             style="@style/PercentSpinner"
                             android:layout_width="0dp"
