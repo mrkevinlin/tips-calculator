@@ -20,7 +20,7 @@ public class PercentDialogFragment extends DialogFragment {
     double per;
 
     public interface PercentDialogListener {
-        public void addPercentToSpinner(double p);
+        public void addPercentToSpinner(double p, boolean r);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class PercentDialogFragment extends DialogFragment {
 
                             }
                         }
-                        callback.addPercentToSpinner(per);
+                        callback.addPercentToSpinner(per, false);
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -70,6 +70,6 @@ public class PercentDialogFragment extends DialogFragment {
     @Override
     public void onCancel(DialogInterface dialog) {
         super.onCancel(dialog);
-        callback.addPercentToSpinner(0);
+        callback.addPercentToSpinner(0, false);
     }
 }

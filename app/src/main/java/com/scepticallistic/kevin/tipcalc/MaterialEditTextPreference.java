@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -14,7 +13,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
 
-public class MaterialEditTextPreference extends EditTextPreference implements PreferenceManager.OnActivityDestroyListener {
+public class MaterialEditTextPreference extends EditTextPreference {
 
     public MaterialEditTextPreference(Context context, AttributeSet attrs) {
         super(context, attrs);

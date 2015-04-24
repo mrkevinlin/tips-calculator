@@ -337,7 +337,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         take_people.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (people > 2) {
+                if (people > defPeople) {
                     people--;
                 } else {
                     hideCard(rotatePlus);
@@ -375,10 +375,11 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
     public void onNothingSelected(AdapterView<?> parent) {
     }
 
-    public void addPercentToSpinner(double p) {
-        rounding = true;
+    public void addPercentToSpinner(double p, boolean r) {
+        rounding = r;
         spinner.setAdapter(adapter);
         if (p == 0) {
+            if (spinnerPosition >= percents.size()) spinnerPosition = 0;
             spinner.setSelection(spinnerPosition);
         } else {
             if (percents.size() > percent_array_length) {
@@ -388,7 +389,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
             spinner.setSelection(percents.size() - 1);
             spinnerPosition = percents.size() - 1;
         }
-        rounding = false;
+//        rounding = false;
     }
 
     private void showPercentDialog() {
@@ -445,7 +446,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
             total = sale + tip;
 
 
-            addPercentToSpinner(percent);
+            addPercentToSpinner(percent, true);
             ((TextView) total_text).setText(String.format("%.2f", total));
 
             if (split_card.isShown()) {
@@ -462,7 +463,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
             percent = (tip / sale) * 100;
 
             ((TextView) tip_text).setText(String.format("%.2f", tip));
-            addPercentToSpinner(percent);
+            addPercentToSpinner(percent, true);
 
             recalculate = true;
         }

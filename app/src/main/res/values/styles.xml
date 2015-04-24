@@ -28,12 +28,12 @@
         <item name="android:paddingRight">8dp</item>
     </style>
 
-    <style name="DollarTheme">
+    <style name="DollarStyle">
         <item name="android:textSize">32sp</item>
         <item name="android:textColor">@color/gray</item>
     </style>
 
-    <style name="NumberTheme">
+    <style name="NumberStyle">
         <item name="android:textSize">32sp</item>
         <item name="android:gravity">end</item>
         <item name="android:inputType">numberDecimal</item>

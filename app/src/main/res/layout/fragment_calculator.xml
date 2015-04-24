@@ -30,14 +30,14 @@
 
                         <TextView
                             android:id="@+id/dollar1"
-                            style="@style/DollarTheme"
+                            style="@style/DollarStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/dollar" />
 
                         <com.rengwuxian.materialedittext.MaterialEditText
                             android:id="@+id/sale_amount"
-                            style="@style/NumberTheme"
+                            style="@style/NumberStyle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:focusable="true"
@@ -60,22 +60,22 @@
                             style="@style/PercentSpinner"
                             android:layout_width="0dp"
                             android:layout_height="48dp"
-                            android:layout_marginEnd="16dp"
-                            android:layout_marginRight="16dp"
+                            android:layout_marginEnd="32dp"
+                            android:layout_marginRight="32dp"
                             android:layout_weight="3"
                             android:focusable="true"
                             android:focusableInTouchMode="true"/>
 
                         <TextView
                             android:id="@+id/dollar2"
-                            style="@style/DollarTheme"
+                            style="@style/DollarStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/dollar" />
 
                         <com.rengwuxian.materialedittext.MaterialEditText
                             android:id="@+id/tip_amount"
-                            style="@style/NumberTheme"
+                            style="@style/NumberStyle"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="4"
@@ -88,14 +88,14 @@
 
                         <TextView
                             android:id="@+id/dollar3"
-                            style="@style/DollarTheme"
+                            style="@style/DollarStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/dollar" />
 
                         <com.rengwuxian.materialedittext.MaterialEditText
                             android:id="@+id/total_amount"
-                            style="@style/NumberTheme"
+                            style="@style/NumberStyle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="@string/total_text"
