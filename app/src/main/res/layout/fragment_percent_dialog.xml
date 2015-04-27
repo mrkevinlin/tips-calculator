@@ -10,7 +10,6 @@
         android:layout_height="wrap_content"
         android:paddingBottom="20dp"
         android:text="@string/custom_dialog_title"
-        android:textSize="20sp"
         android:textStyle="bold" />
 
     <LinearLayout
@@ -18,7 +17,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <com.rengwuxian.materialedittext.MaterialEditText
+        <EditText
             android:id="@+id/custom_percent_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -26,15 +25,12 @@
             android:gravity="end"
             android:inputType="numberDecimal"
             android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:textCursorDrawable="@drawable/color_cursor"
-            android:textSize="20sp" />
+            android:paddingRight="8dp"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="%"
-            android:textSize="24sp" />
+            android:text="%"/>
 
     </LinearLayout>
 

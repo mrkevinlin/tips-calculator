@@ -9,7 +9,6 @@
         android:key="@string/pref_unit_key"
         android:maxLength="3"
         android:singleLine="true"
-        android:textCursorDrawable="@drawable/color_cursor"
         android:title="@string/pref_unit_label" />
 
     <EditTextPreference
@@ -20,7 +19,6 @@
         android:inputType="numberDecimal"
         android:key="@string/pref_percents_key"
         android:singleLine="true"
-        android:textCursorDrawable="@drawable/color_cursor"
         android:title="@string/pref_percents_label" />
 
     <EditTextPreference
@@ -30,7 +28,6 @@
         android:inputType="number"
         android:key="@string/pref_people_key"
         android:singleLine="true"
-        android:textCursorDrawable="@drawable/color_cursor"
         android:title="@string/pref_people_label" />
 
 </PreferenceScreen>
