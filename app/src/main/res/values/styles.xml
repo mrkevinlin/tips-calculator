@@ -48,6 +48,7 @@
 
     <style name="PercentSpinner">
         <item name="android:dropDownVerticalOffset">-48dp</item>
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel</item>
     </style>
 
     <style name="FunctionButton" parent="Widget.AppCompat.Button.Borderless">

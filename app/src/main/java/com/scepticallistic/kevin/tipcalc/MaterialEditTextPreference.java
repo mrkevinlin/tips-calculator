@@ -69,6 +69,9 @@ public class MaterialEditTextPreference extends EditTextPreference {
                 .findViewById(R.id.edittext_container);
 
         editText.setBackgroundResource(R.drawable.preference_edittext_material_underline);
+        int padding = (int) (4 * dialogView.getResources().getDisplayMetrics().density);
+        editText.setPadding(0, padding, 0, padding);
+
         if (container != null) {
             container.addView(editText, ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);

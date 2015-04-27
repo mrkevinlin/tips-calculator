@@ -10,7 +10,8 @@
         android:layout_height="wrap_content"
         android:paddingBottom="20dp"
         android:text="@string/custom_dialog_title"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:textSize="18sp"/>
 
     <LinearLayout
         android:layout_width="match_parent"

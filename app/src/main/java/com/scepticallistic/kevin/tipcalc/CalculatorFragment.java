@@ -358,16 +358,18 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
                 percent = Double.parseDouble(percent_number);
                 percentChanged();
                 spinnerPosition = position;
-                // Remove messy recalculated or custom percentages upon selection of default ones.
-                if (percents.size() > percent_array_length) {
-                    percents.remove(percents.size() - 1);
-                }
             } catch (NumberFormatException e) {
                 if (percent_number.equals("Custo")) {
                     showPercentDialog();
                 }
             }
         }
+
+        // Remove messy recalculated or custom percentages upon selection of default ones.
+        if (percents.size() > percent_array_length) {
+            percents.remove(percents.size() - 1);
+        }
+
         rounding = false;
     }
 
@@ -379,6 +381,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         rounding = r;
         spinner.setAdapter(adapter);
         if (p == 0) {
+            //Todo: When implemented default percent preference, set to default instead of 0.
             if (spinnerPosition >= percents.size()) spinnerPosition = 0;
             spinner.setSelection(spinnerPosition);
         } else {
