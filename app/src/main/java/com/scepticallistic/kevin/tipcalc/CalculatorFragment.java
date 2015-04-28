@@ -33,6 +33,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class CalculatorFragment extends Fragment implements AdapterView.OnItemSelectedListener, PercentDialogFragment.PercentDialogListener {
     private static final String LOG_TAG = CalculatorFragment.class.getSimpleName();
@@ -153,7 +154,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
 
             addPercentString = defaultPercentString.substring(0, defaultPercentString.indexOf(","));
 
-            if (addPercentString.matches("\\d+")) {
+            if (addPercentString.matches("\\d+") && Integer.parseInt(addPercentString)!=0) {
                 defPercents.add(addPercentString + "%");
             }
             defaultPercentString = defaultPercentString.substring(defaultPercentString.indexOf(",") + 1);
@@ -161,11 +162,11 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         }
 
         // Adding in the last number that is not bordered by a comma.
-        if (!defaultPercentString.isEmpty() && defaultPercentString.matches("\\d+")) {
+        if (!defaultPercentString.isEmpty() && defaultPercentString.matches("\\d+") && Integer.parseInt(addPercentString)!=0) {
             defPercents.add(defaultPercentString + "%");
         }
+        Collections.sort(defPercents, new PercentComparator());
         defPercents.add("Custom");
-//        Collections.sort(defPercents);
 
         percent_array_length = defPercents.size();
         percents.addAll(defPercents);
