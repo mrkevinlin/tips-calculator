@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="DollarTheme">
-        <item name="android:textSize">32sp</item>
+    <style name="DollarStyle">
+        <item name="android:textSize">24sp</item>
         <item name="android:textColor">@color/gray</item>
         <item name="android:fontFamily">sans-serif-light</item>
     </style>
 
-    <style name="NumberTheme">
-        <item name="android:textSize">32sp</item>
+    <style name="NumberStyle">
+        <item name="android:paddingRight">4dp</item>
         <item name="android:gravity">end</item>
         <item name="android:inputType">numberDecimal</item>
         <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textSize">28sp</item>
         <item name="android:textCursorDrawable">@drawable/color_cursor</item>
-        <item name="android:paddingRight">4dp</item>
+        <item name="android:focusable">true</item>
+        <item name="android:focusableInTouchMode">true</item>
         <item name="met_underlineColor">@color/gray</item>
         <item name="met_floatingLabel">highlight</item>
         <item name="met_floatingLabelTextSize">16sp</item>

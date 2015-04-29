@@ -1,10 +1,12 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="TipCalcTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:displayOptions">showTitle</item>
         <item name="colorPrimary">@color/blue</item>
         <item name="colorPrimaryDark">@color/dark_blue</item>
-        <item name="android:displayOptions">showTitle</item>
+        <item name="android:colorPressedHighlight">@color/blue</item>
+        <item name="android:colorActivatedHighlight">@color/blue</item>
+
     </style>
 
     <style name="CardStyle">
@@ -13,9 +15,6 @@
         <item name="android:layout_marginLeft">8dp</item>
         <item name="android:layout_marginRight">8dp</item>
         <item name="android:layout_marginBottom">8dp</item>
-        <item name="cardBackgroundColor">#FFF</item>
-        <item name="cardCornerRadius">2dp</item>
-        <item name="cardElevation">2dp</item>
         <item name="contentPadding">8dp</item>
     </style>
 
@@ -24,55 +23,60 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:orientation">horizontal</item>
         <item name="android:paddingTop">8dp</item>
-        <item name="android:paddingLeft">8dp</item>
-        <item name="android:paddingRight">8dp</item>
+        <item name="android:paddingLeft">12dp</item>
+        <item name="android:paddingRight">12dp</item>
     </style>
 
-    <style name="DollarTheme">
-        <item name="android:textSize">32sp</item>
+    <style name="DollarStyle">
+        <item name="android:textSize">24sp</item>
         <item name="android:textColor">@color/gray</item>
     </style>
 
-    <style name="NumberTheme">
-        <item name="android:textSize">32sp</item>
+    <style name="NumberStyle">
+        <item name="android:paddingRight">4dp</item>
         <item name="android:gravity">end</item>
         <item name="android:inputType">numberDecimal</item>
+        <item name="android:textSize">28sp</item>
         <item name="android:textCursorDrawable">@drawable/color_cursor</item>
-        <item name="android:paddingRight">4dp</item>
+        <item name="android:focusable">true</item>
+        <item name="android:focusableInTouchMode">true</item>
         <item name="met_underlineColor">@color/gray</item>
         <item name="met_floatingLabel">highlight</item>
         <item name="met_floatingLabelTextSize">16sp</item>
         <item name="met_floatingLabelPadding">4dp</item>
     </style>
 
-    <style name="FunctionButton" parent="@android:style/Widget.DeviceDefault.Button.Borderless">
-        <item name="android:background">@drawable/button</item>
-        <item name="android:paddingLeft">8dp</item>
-        <item name="android:paddingRight">8dp</item>
+    <style name="PercentSpinner">
+        <item name="android:dropDownVerticalOffset">-48dp</item>
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel</item>
     </style>
 
-    <style name="FAB" parent="@android:style/Widget.Button">
+    <style name="FunctionButton" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:background">@drawable/button</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+    </style>
+
+    <style name="FAB">
         <item name="android:layout_width">72dp</item>
         <item name="android:layout_height">72dp</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:background">@drawable/fab</item>
     </style>
 
-    <style name="IncrementButton" parent="@android:style/TextAppearance.Holo.Widget.Button">
+    <style name="IncrementButton" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:background">@drawable/button</item>
-        <item name="android:textColor">@color/light_green</item>
-        <item name="android:textSize">24sp</item>
         <item name="android:padding">0dp</item>
-    </style>
-
-    <style name="AboutTitles">
-        <item name="android:paddingTop">16dp</item>
-        <item name="android:paddingBottom">16dp</item>
+        <item name="android:textColor">@color/blue</item>
         <item name="android:textSize">24sp</item>
-        <item name="android:textColor">@color/dark_blue</item>
     </style>
 
-    <style name="AboutParagraphs">
+    <style name="SplitCheckText">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/gray</item>
+    </style>
+
+    <style name="AboutText">
         <item name="android:padding">8dp</item>
         <item name="android:textSize">16sp</item>
     </style>

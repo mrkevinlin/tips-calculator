@@ -2,7 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#e5e5e5"
     tools:context="com.scepticallistic.kevin.tipcalc.MainActivity"
     android:clickable="true"
     android:focusableInTouchMode="true">

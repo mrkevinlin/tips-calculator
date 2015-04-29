@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <com.scepticallistic.kevin.tipcalc.MaterialEditTextPreference
+        android:defaultValue="@string/pref_percents_default"
+        android:dialogMessage="@string/pref_percents_message"
+        android:dialogTitle="@string/pref_percents_title"
+        android:digits="0123456789,"
+        android:inputType="numberDecimal"
+        android:key="@string/pref_percents_key"
+        android:singleLine="true"
+        android:textCursorDrawable="@drawable/preference_edittext_material_cursor"
+        android:title="@string/pref_percents_label" />
+
+    <com.scepticallistic.kevin.tipcalc.MaterialEditTextPreference
+        android:defaultValue="@string/pref_default_default"
+        android:dialogMessage="@string/pref_default_message"
+        android:dialogTitle="@string/pref_default_title"
+        android:inputType="number"
+        android:key="@string/pref_default_key"
+        android:singleLine="true"
+        android:textCursorDrawable="@drawable/preference_edittext_material_cursor"
+        android:title="@string/pref_default_label" />
+
+    <com.scepticallistic.kevin.tipcalc.MaterialEditTextPreference
+        android:defaultValue="@string/pref_people_default"
+        android:dialogMessage="@string/pref_people_message"
+        android:dialogTitle="@string/pref_people_title"
+        android:inputType="number"
+        android:key="@string/pref_people_key"
+        android:singleLine="true"
+        android:textCursorDrawable="@drawable/preference_edittext_material_cursor"
+        android:title="@string/pref_people_label" />
+
+    <com.scepticallistic.kevin.tipcalc.MaterialEditTextPreference
+        android:defaultValue="@string/pref_unit_default"
+        android:dialogMessage="@string/pref_unit_message"
+        android:dialogTitle="@string/pref_unit_title"
+        android:inputType="text"
+        android:key="@string/pref_unit_key"
+        android:maxLength="3"
+        android:singleLine="true"
+        android:textCursorDrawable="@drawable/preference_edittext_material_cursor"
+        android:title="@string/pref_unit_label" />
+
+</PreferenceScreen>

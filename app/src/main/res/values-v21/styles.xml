@@ -1,14 +1,18 @@
 <resources>
 
+    <style name="PercentSpinner">
+        <item name="android:popupBackground">@color/white</item>
+    </style>
+
     <style name="FunctionButton" parent="@android:style/Widget.Material.Button.Borderless">
     </style>
 
     <style name="IncrementButton" parent="@android:style/Widget.Material.Button.Borderless">
-        <item name="android:textColor">@color/light_green</item>
+        <item name="android:textColor">@color/blue</item>
         <item name="android:textSize">24sp</item>
     </style>
 
-    <style name="FAB" parent="@android:style/Widget.Material.Button">
+    <style name="FAB" >
         <item name="android:layout_width">56dp</item>
         <item name="android:layout_height">56dp</item>
         <item name="android:layout_gravity">center</item>

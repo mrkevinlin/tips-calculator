@@ -2,5 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
     <item android:id="@+id/action_about" android:title="@string/action_about"
+        android:orderInCategory="50" app:showAsAction="never" />
+    <item android:id="@+id/action_settings" android:title="@string/settings_text"
         android:orderInCategory="100" app:showAsAction="never" />
 </menu>

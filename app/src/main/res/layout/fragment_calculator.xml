@@ -4,8 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
-    <!--android:focusable="true"-->
-    <!--android:focusableInTouchMode="true"-->
 
     <ScrollView
         android:id="@+id/scroll_view"
@@ -17,7 +15,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+            <android.support.v7.widget.CardView
                 android:id="@+id/calculator_card"
                 style="@style/CardStyle"
                 android:layout_marginTop="8dp">
@@ -31,81 +29,73 @@
                     <LinearLayout style="@style/CalculatorRows">
 
                         <TextView
-                            style="@style/DollarTheme"
+                            android:id="@+id/dollar1"
+                            style="@style/DollarStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/dollar" />
 
                         <com.rengwuxian.materialedittext.MaterialEditText
                             android:id="@+id/sale_amount"
-                            style="@style/NumberTheme"
+                            style="@style/NumberStyle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:focusable="true"
+                            android:focusableInTouchMode="true"
                             android:hint="@string/sale_text"
-                            android:nextFocusDown="@+id/percent_amount"
-                            android:nextFocusForward="@+id/percent_amount"
+                            android:nextFocusDown="@+id/percent_amount_spinner"
+                            android:nextFocusForward="@+id/percent_amount_spinner"
                             app:met_textColor="@color/blue_gray">
 
                             <requestFocus />
+
                         </com.rengwuxian.materialedittext.MaterialEditText>
 
                     </LinearLayout>
 
                     <LinearLayout style="@style/CalculatorRows">
 
-                        <TextView
-                            style="@style/DollarTheme"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/dollar"
-                            android:visibility="invisible" />
-                        <!--<AutoCompleteTextView-->
-                        <!--TODO: DROP DOWNS??-->
-                        <com.rengwuxian.materialedittext.MaterialEditText
-                            android:id="@+id/percent_amount"
-                            style="@style/NumberTheme"
+                        <android.support.v7.widget.AppCompatSpinner
+                            android:id="@+id/percent_amount_spinner"
+                            style="@style/PercentSpinner"
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:hint="@string/tip_pct_text"
-                            android:nextFocusDown="@+id/tip_amount"
-                            android:nextFocusForward="@+id/tip_amount" />
+                            android:layout_height="48dp"
+                            android:layout_marginEnd="32dp"
+                            android:layout_marginRight="32dp"
+                            android:layout_weight="3"
+                            android:focusable="true"
+                            android:focusableInTouchMode="true" />
 
                         <TextView
-                            style="@style/DollarTheme"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingEnd="32dp"
-                            android:paddingRight="32dp"
-                            android:text="@string/pct_text" />
-
-                        <TextView
-                            style="@style/DollarTheme"
+                            android:id="@+id/dollar2"
+                            style="@style/DollarStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/dollar" />
 
                         <com.rengwuxian.materialedittext.MaterialEditText
                             android:id="@+id/tip_amount"
-                            style="@style/NumberTheme"
+                            style="@style/NumberStyle"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="2"
-                            android:hint="@string/tip_amt_text" />
+                            android:layout_weight="4"
+                            android:hint="@string/tip_amt_text"
+                            app:met_textColor="@color/light_green" />
 
                     </LinearLayout>
 
                     <LinearLayout style="@style/CalculatorRows">
 
                         <TextView
-                            style="@style/DollarTheme"
+                            android:id="@+id/dollar3"
+                            style="@style/DollarStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/dollar" />
 
                         <com.rengwuxian.materialedittext.MaterialEditText
                             android:id="@+id/total_amount"
-                            style="@style/NumberTheme"
+                            style="@style/NumberStyle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="@string/total_text"
@@ -151,6 +141,12 @@
                     android:gravity="center"
                     android:orientation="vertical">
 
+                    <TextView
+                        style="@style/SplitCheckText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/split_check_title" />
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -166,11 +162,11 @@
 
                         <TextView
                             android:id="@+id/people_count"
+                            style="@style/SplitCheckText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:padding="8dp"
-                            android:textSize="24sp" />
+                            android:padding="8dp" />
 
                         <Button
                             android:id="@+id/add_people"
@@ -196,10 +192,10 @@
                             android:textSize="44sp" />
 
                         <TextView
+                            style="@style/SplitCheckText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/per_person"
-                            android:textSize="16sp" />
+                            android:text="@string/per_person" />
 
                     </LinearLayout>
 
@@ -212,16 +208,16 @@
 
                         <TextView
                             android:id="@+id/split_tip"
+                            style="@style/SplitCheckText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/light_green"
-                            android:textSize="16sp" />
+                            android:textColor="@color/light_green" />
 
                         <TextView
+                            style="@style/SplitCheckText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/tip_per"
-                            android:textSize="16sp" />
+                            android:text="@string/tip_per" />
 
                     </LinearLayout>
 
@@ -236,8 +232,8 @@
         android:layout_width="84dp"
         android:layout_height="84dp"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:gravity="center">
 
         <Button
