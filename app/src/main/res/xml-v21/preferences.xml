@@ -3,8 +3,8 @@
 
     <EditTextPreference
         android:defaultValue="@string/pref_percents_default"
-        android:dialogMessage="List numbers separated by commas. \nThe first number is selected by default."
-        android:dialogTitle="Choose the default % values"
+        android:dialogMessage="@string/pref_percents_message"
+        android:dialogTitle="@string/pref_percents_title"
         android:digits="0123456789,"
         android:inputType="numberDecimal"
         android:key="@string/pref_percents_key"
@@ -13,8 +13,8 @@
 
     <EditTextPreference
         android:defaultValue="@string/pref_default_default"
-        android:dialogMessage="This is the value the app starts on."
-        android:dialogTitle="Enter a percent number"
+        android:dialogMessage="@string/pref_default_message"
+        android:dialogTitle="@string/pref_default_title"
         android:inputType="number"
         android:key="@string/pref_default_key"
         android:singleLine="true"
@@ -22,8 +22,8 @@
 
     <EditTextPreference
         android:defaultValue="@string/pref_people_default"
-        android:dialogMessage="Anything below 2 will set the number to 2."
-        android:dialogTitle="How many people?"
+        android:dialogMessage="@string/pref_people_message"
+        android:dialogTitle="@string/pref_people_title"
         android:inputType="number"
         android:key="@string/pref_people_key"
         android:singleLine="true"
@@ -31,8 +31,8 @@
 
     <EditTextPreference
         android:defaultValue="@string/pref_unit_default"
-        android:dialogMessage="Up to 3 characters"
-        android:dialogTitle="Pick a unit of currency"
+        android:dialogMessage="@string/pref_unit_message"
+        android:dialogTitle="@string/pref_unit_title"
         android:inputType="text"
         android:key="@string/pref_unit_key"
         android:maxLength="3"
