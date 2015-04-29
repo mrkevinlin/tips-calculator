@@ -15,6 +15,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.AppCompatSpinner;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,9 +48,10 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
     public int people, defPeople, percent_array_length, spinnerPosition;
     public SharedPreferences preferences;
     public SharedPreferences.OnSharedPreferenceChangeListener prefListener;
-    public String prefUnitKey, prefPeopleKey, prefPercentsKey, unitSymbol, peoplePref, defaultPercentString, addPercentString;
+    public String prefUnitKey, prefPeopleKey, prefPercentsKey, prefDefaultKey, unitSymbol, peoplePref, percentString, addPercentString, defaultPercent;
     boolean recalculate = true;
     boolean rounding = false;
+    int defaultIndex = 0;
 
     public CalculatorFragment() {
     }
@@ -64,9 +66,12 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         prefUnitKey = main.getString(R.string.pref_unit_key);
         prefPeopleKey = main.getString(R.string.pref_people_key);
         prefPercentsKey = main.getString(R.string.pref_percents_key);
+        prefDefaultKey = main.getString(R.string.pref_default_key);
 
         spinner = (AppCompatSpinner) rootView.findViewById(R.id.percent_amount_spinner);
         adapter = new ArrayAdapter<>(main, R.layout.spinner_item, percents);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        spinner.setOnItemSelectedListener(this);
 
         preferences = PreferenceManager.getDefaultSharedPreferences(main);
         setUnitPreference(preferences);
@@ -82,6 +87,8 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
                     setUnitPreference(sharedPreferences);
                 } else if (key.equals(prefPercentsKey)) {
                     setSpinnerPreferences(sharedPreferences);
+                } else if (key.equals(prefDefaultKey)) {
+                    setDefaultPreference(sharedPreferences);
                 }
             }
         };
@@ -97,11 +104,6 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         people_count = rootView.findViewById(R.id.people_count);
         split_tip = rootView.findViewById(R.id.split_tip);
         split_total = rootView.findViewById(R.id.split_total);
-
-        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
-        spinner.setSelection(0);
-        spinner.setAdapter(adapter);
-        spinner.setOnItemSelectedListener(this);
 
         setCalcListeners();
 
@@ -140,38 +142,59 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
 
     private void setSpinnerPreferences(SharedPreferences sp) {
         defPercents.clear();
-        percents.clear();
-        defaultPercentString = sp.getString(
+        percentString = sp.getString(
                 main.getString(R.string.pref_percents_key),
                 main.getString(R.string.pref_percents_default));
 
         // If user did not enter in any valid numbers, resort to default.
-        if (!defaultPercentString.matches(".*\\d.*")) {
-            defaultPercentString = main.getString(R.string.pref_percents_default);
+        if (!percentString.matches(".*\\d.*")) {
+            percentString = main.getString(R.string.pref_percents_default);
         }
 
-        while (defaultPercentString.contains(",") && defaultPercentString.matches(".*\\d.*")) {
+        while (percentString.contains(",") && percentString.matches(".*\\d.*")) {
 
-            addPercentString = defaultPercentString.substring(0, defaultPercentString.indexOf(","));
+            addPercentString = percentString.substring(0, percentString.indexOf(","));
 
-            if (addPercentString.matches("\\d+") && Integer.parseInt(addPercentString)!=0) {
+            if (addPercentString.matches("\\d+") && Integer.parseInt(addPercentString) != 0) {
                 defPercents.add(addPercentString + "%");
             }
-            defaultPercentString = defaultPercentString.substring(defaultPercentString.indexOf(",") + 1);
+            percentString = percentString.substring(percentString.indexOf(",") + 1);
 
         }
 
         // Adding in the last number that is not bordered by a comma.
-        if (!defaultPercentString.isEmpty() && defaultPercentString.matches("\\d+") && Integer.parseInt(addPercentString)!=0) {
-            defPercents.add(defaultPercentString + "%");
+        if (!percentString.isEmpty() && percentString.matches("\\d+") && Integer.parseInt(addPercentString) != 0) {
+            defPercents.add(percentString + "%");
+        }
+
+        setDefaultPreference(sp);
+    }
+
+    private void setDefaultPreference(SharedPreferences sp) {
+        defaultPercent = sp.getString(main.getString(R.string.pref_default_key), main.getString(R.string.pref_default_default)) + "%";
+
+        if (defPercents.indexOf(defaultPercent) < 0) {
+            defPercents.add(defaultPercent);
+        }
+        try {
+            defPercents.remove("Custom");
+        } catch (IndexOutOfBoundsException e) {
+            Log.d(LOG_TAG, e.getMessage());
         }
         Collections.sort(defPercents, new PercentComparator());
+        defaultIndex = defPercents.indexOf(defaultPercent);
         defPercents.add("Custom");
-
         percent_array_length = defPercents.size();
+
+        populateSpinner();
+    }
+
+    private void populateSpinner() {
+        percents.clear();
         percents.addAll(defPercents);
-        spinner.setSelection(0);
+
         spinner.setAdapter(adapter);
+        spinner.setSelection(defaultIndex);
     }
 
     private void setCalcListeners() {
@@ -382,8 +405,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         rounding = r;
         spinner.setAdapter(adapter);
         if (p == 0) {
-            //Todo: When implemented default percent preference, set to default instead of 0.
-            if (spinnerPosition >= percents.size()) spinnerPosition = 0;
+            if (spinnerPosition >= percents.size()) spinnerPosition = defaultIndex;
             spinner.setSelection(spinnerPosition);
         } else {
             if (percents.size() > percent_array_length) {
@@ -406,8 +428,8 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
     public void resetSpinner() {
         percents.clear();
         percents.addAll(defPercents);
-        spinner.setSelection(0);
         spinner.setAdapter(adapter);
+        spinner.setSelection(defaultIndex);
     }
 
     private void saleChanged() {
