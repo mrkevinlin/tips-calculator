@@ -15,6 +15,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.AppCompatSpinner;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +29,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -41,11 +43,11 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
     private static final ArrayList<String> defaultPercentsArray = new ArrayList<>();
     private static final ArrayList<String> toSpinnerPercentsArray = new ArrayList<>();
     public Activity main;
-    public View rootView, scroll_view, calculator_card, sale_text, tip_text, total_text, fab_plus, split_card, people_count, split_tip, split_total;
+    public View rootView, scroll_view, calculator_card, sale_text, tip_text, total_text, fab_plus, split_card, people_count, split_tip, split_total, uneven_people_count;
     public AppCompatSpinner spinner;
     public ArrayAdapter<String> adapter;
-    public double sale, percent, tip, total, splitTip, splitTotal;
-    public int people, defPeople, percent_array_length, spinnerPosition;
+    public double sale, percent, tip, total, splitTip, splitTotal, salesTax, salesTaxRate;
+    public int people, unevenPeople, defPeople, percent_array_length, spinnerPosition;
     public SharedPreferences preferences;
     public SharedPreferences.OnSharedPreferenceChangeListener prefListener;
     public String prefUnitKey, prefPeopleKey, prefPercentsKey, prefDefaultKey, unitSymbol, peoplePref, percentString, addPercentString, defaultPercent;
@@ -104,6 +106,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         people_count = rootView.findViewById(R.id.people_count);
         split_tip = rootView.findViewById(R.id.split_tip);
         split_total = rootView.findViewById(R.id.split_total);
+        uneven_people_count = rootView.findViewById(R.id.people_count_uneven);
 
         setCalcListeners();
 
@@ -116,6 +119,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         }
 
         setButtons(rootView, rotatePlus, rotateX);
+        setUpUnevens();
 
         return rootView;
     }
@@ -129,6 +133,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         }
         defPeople = Integer.parseInt(peoplePref);
         people = defPeople;
+        unevenPeople = defPeople;
     }
 
     public void setUnitPreference(SharedPreferences sp) {
@@ -138,6 +143,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         ((TextView) rootView.findViewById(R.id.dollar1)).setText(unitSymbol);
         ((TextView) rootView.findViewById(R.id.dollar2)).setText(unitSymbol);
         ((TextView) rootView.findViewById(R.id.dollar3)).setText(unitSymbol);
+        ((TextView) rootView.findViewById(R.id.dollar4)).setText(unitSymbol);
     }
 
     private void setSpinnerPreferences(SharedPreferences sp) {
@@ -292,14 +298,13 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         });
     }
 
-    private void setButtons(View rootView, final Animation rotatePlus, final Animation rotateX) {
+    private void setButtons(final View rootView, final Animation rotatePlus, final Animation rotateX) {
 
         final Button clear_button = (Button) rootView.findViewById(R.id.clear_button);
         clear_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 recalculate = false;
                 ((ScrollView) scroll_view).smoothScrollTo(0, 0);
-
                 ((TextView) sale_text).setText("");
                 ((TextView) tip_text).setText("");
                 ((TextView) total_text).setText("");
@@ -309,6 +314,8 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
                 tip = 0;
                 total = 0;
                 people = defPeople;
+                unevenPeople = defPeople;
+                setUpUnevens();
                 recalculate = true;
                 if (split_card.isShown())
                     hideCard(rotatePlus);
@@ -369,6 +376,23 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
                 }
                 setPeople();
                 calcSplits();
+            }
+        });
+
+        Button uneven_split = (Button) rootView.findViewById(R.id.uneven_split_button);
+        uneven_split.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showUnevens();
+            }
+        });
+
+        Button even_split = (Button) rootView.findViewById(R.id.even_split_button);
+        even_split.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rootView.findViewById(R.id.even_splits).setVisibility(View.VISIBLE);
+                rootView.findViewById(R.id.uneven_splits).setVisibility(View.GONE);
             }
         });
     }
@@ -495,6 +519,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
 
     private void setPeople() {
         ((TextView) people_count).setText(Integer.toString(people) + getString(R.string.people));
+        ((TextView) uneven_people_count).setText(Integer.toString(unevenPeople) + getString(R.string.people));
     }
 
     private void calcSplits() {
@@ -565,6 +590,43 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
                 split_card.setVisibility(View.GONE);
             }
         });
+    }
+
+    private void showUnevens() {
+        rootView.findViewById(R.id.uneven_splits).setVisibility(View.VISIBLE);
+        rootView.findViewById(R.id.even_splits).setVisibility(View.GONE);
+    }
+
+    private void setUpUnevens() {
+        LinearLayout personColumn = (LinearLayout) rootView.findViewById(R.id.uneven_persons);
+        LinearLayout subtotalColumn = (LinearLayout) rootView.findViewById(R.id.uneven_subtotals);
+        LinearLayout totalColumn = (LinearLayout) rootView.findViewById(R.id.uneven_totals);
+
+        personColumn.removeAllViews();
+        subtotalColumn.removeAllViews();
+        totalColumn.removeAllViews();
+
+        for (int i = 0; i < unevenPeople; i++) {
+            TextView personRow = new TextView(rootView.getContext());
+            personRow.setText(Integer.toString(i + 1));
+            personRow.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, (int) (48 * getResources().getDisplayMetrics().density)));
+            personRow.setTextSize(16);
+            personRow.setGravity(Gravity.CENTER);
+            personColumn.addView(personRow);
+
+            EditText subtotalRow = new EditText(rootView.getContext());
+            subtotalRow.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, (int) (48 * getResources().getDisplayMetrics().density)));
+            subtotalRow.setHint("Item Subtotal");
+            subtotalRow.setGravity(Gravity.CENTER);
+            subtotalColumn.addView(subtotalRow);
+
+            TextView totalRow = new TextView(rootView.getContext());
+            totalRow.setText("$0.00");
+            totalRow.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, (int) (48 * getResources().getDisplayMetrics().density)));
+            totalRow.setTextSize(16);
+            totalRow.setGravity(Gravity.CENTER);
+            totalColumn.addView(totalRow);
+        }
     }
 
     private void hideKeyboard() {

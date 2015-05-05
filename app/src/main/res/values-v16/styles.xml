@@ -2,6 +2,8 @@
 <resources>
 
     <style name="DollarStyle">
+        <item name="android:paddingEnd">4dp</item>
+        <item name="android:paddingRight">4dp</item>
         <item name="android:textSize">24sp</item>
         <item name="android:textColor">@color/gray</item>
         <item name="android:fontFamily">sans-serif-light</item>
