@@ -501,7 +501,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         splitTip = tip / people;
         splitTotal = total / people;
 
-        ((TextView) split_tip).setText(unitSymbol + String.format("%.2f", splitTip));
+        ((TextView) split_tip).setText(unitSymbol + String.format("%.2f", splitTip) + rootView.getResources().getString(R.string.tip_per));
         ((TextView) split_total).setText(unitSymbol + String.format("%.2f", splitTotal));
     }
 

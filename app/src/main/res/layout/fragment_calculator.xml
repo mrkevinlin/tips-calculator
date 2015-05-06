@@ -132,95 +132,124 @@
             <android.support.v7.widget.CardView
                 android:id="@+id/split_card"
                 style="@style/CardStyle"
-                android:visibility="gone"
-                app:contentPadding="16dp">
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
                     android:orientation="vertical">
-
-                    <TextView
-                        style="@style/SplitCheckText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/split_check_title" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="horizontal">
-
-                        <Button
-                            android:id="@+id/take_people"
-                            style="@style/IncrementButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/subtract" />
-
-                        <TextView
-                            android:id="@+id/people_count"
-                            style="@style/SplitCheckText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:padding="8dp" />
-
-                        <Button
-                            android:id="@+id/add_people"
-                            style="@style/IncrementButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/add" />
-
-                    </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:padding="24dp">
+                        android:padding="8dp">
 
-                        <TextView
-                            android:id="@+id/split_total"
-                            android:layout_width="wrap_content"
+                        <RelativeLayout
+                            android:id="@+id/split_header"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/green"
-                            android:textSize="44sp" />
+                            android:gravity="center">
 
-                        <TextView
-                            style="@style/SplitCheckText"
-                            android:layout_width="wrap_content"
+                            <TextView
+                                android:id="@+id/split_title"
+                                style="@style/SplitCheckText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentTop="true"
+                                android:layout_centerHorizontal="true"
+                                android:text="@string/split_check_title" />
+
+                            <Button
+                                android:id="@+id/take_people"
+                                style="@style/IncrementButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentLeft="true"
+                                android:layout_below="@+id/split_title"
+                                android:layout_toLeftOf="@+id/people_count"
+                                android:text="@string/subtract" />
+
+                            <TextView
+                                android:id="@+id/people_count"
+                                style="@style/SplitCheckText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/split_title"
+                                android:layout_centerHorizontal="true"
+                                android:padding="8dp" />
+
+                            <Button
+                                android:id="@+id/add_people"
+                                style="@style/IncrementButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentRight="true"
+                                android:layout_below="@+id/split_title"
+                                android:layout_toRightOf="@+id/people_count"
+                                android:text="@string/add" />
+
+                        </RelativeLayout>
+
+                        <LinearLayout
+                            android:id="@+id/even_split_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/per_person" />
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="24dp">
+
+                            <TextView
+                                android:id="@+id/split_total"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/green"
+                                android:textSize="44sp" />
+
+                            <TextView
+                                style="@style/SplitCheckText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/per_person" />
+
+                            <TextView
+                                android:id="@+id/split_tip"
+                                style="@style/SplitCheckText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingTop="24dp"
+                                android:textColor="@color/light_green" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/uneven_split_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <com.rengwuxian.materialedittext.MaterialEditText
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:hint="Sales Tax" />
+
+                            <LinearLayout
+                                android:id="@+id/people_list"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                            </LinearLayout>
+
+                        </LinearLayout>
 
                     </LinearLayout>
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <Button
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="horizontal"
-                        android:paddingTop="16dp">
-
-                        <TextView
-                            android:id="@+id/split_tip"
-                            style="@style/SplitCheckText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/light_green" />
-
-                        <TextView
-                            style="@style/SplitCheckText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/tip_per" />
-
-                    </LinearLayout>
-
+                        android:text="Splits" />
                 </LinearLayout>
             </android.support.v7.widget.CardView>
         </LinearLayout>
