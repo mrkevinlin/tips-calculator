@@ -230,17 +230,19 @@
                             android:orientation="vertical">
 
                             <com.rengwuxian.materialedittext.MaterialEditText
+                                android:id="@+id/sales_tax"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:hint="Sales Tax" />
+                                android:hint="Sales Tax"
+                                android:inputType="numberDecimal" />
 
-                            <LinearLayout
+                            <TableLayout
                                 android:id="@+id/people_list"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="vertical">
 
-                            </LinearLayout>
+                            </TableLayout>
 
                         </LinearLayout>
 

@@ -14,7 +14,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.AppCompatSpinner;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,8 +30,11 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -37,21 +42,26 @@ import java.util.Collections;
 
 public class CalculatorFragment extends Fragment implements AdapterView.OnItemSelectedListener, PercentDialogFragment.PercentDialogListener {
     private static final String LOG_TAG = CalculatorFragment.class.getSimpleName();
+    public SharedPreferences preferences;
+    public SharedPreferences.OnSharedPreferenceChangeListener prefListener;
+    public Activity main;
+    public View rootView, scroll_view, calculator_card, sale_text, tip_text, total_text, fab_plus,
+            split_card, people_count, split_tip, split_total, even_content, uneven_content, sales_tax;
+    public TableLayout people_layout;
     private static final ArrayList<String> percentsArray = new ArrayList<>();
     private static final ArrayList<String> defaultPercentsArray = new ArrayList<>();
     private static final ArrayList<String> toSpinnerPercentsArray = new ArrayList<>();
-    public Activity main;
-    public View rootView, scroll_view, calculator_card, sale_text, tip_text, total_text, fab_plus, split_card, people_count, split_tip, split_total;
+    private static final ArrayList<Person> peopleList = new ArrayList<>();
     public AppCompatSpinner spinner;
     public ArrayAdapter<String> adapter;
-    public double sale, percent, tip, total, splitTip, splitTotal;
+    public String prefUnitKey, prefPeopleKey, prefPercentsKey, prefDefaultKey, unitSymbol, peoplePref,
+            percentString, addPercentString, defaultPercent;
+    public double sale, percent, tip, total, splitTip, splitTotal, tax, taxRate;
     public int people, defPeople, percent_array_length, spinnerPosition;
-    public SharedPreferences preferences;
-    public SharedPreferences.OnSharedPreferenceChangeListener prefListener;
-    public String prefUnitKey, prefPeopleKey, prefPercentsKey, prefDefaultKey, unitSymbol, peoplePref, percentString, addPercentString, defaultPercent;
     public int defaultIndex = 0;
     boolean recalculate = true;
     boolean rounding = false;
+    boolean isUnevenShown = false;
 
     public CalculatorFragment() {
     }
@@ -104,18 +114,20 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         people_count = rootView.findViewById(R.id.people_count);
         split_tip = rootView.findViewById(R.id.split_tip);
         split_total = rootView.findViewById(R.id.split_total);
+        even_content = rootView.findViewById(R.id.even_split_content);
+        uneven_content = rootView.findViewById(R.id.uneven_split_content);
+        people_layout = (TableLayout) rootView.findViewById(R.id.people_list);
+        sales_tax = rootView.findViewById(R.id.sales_tax);
 
         setCalcListeners();
-
-        Animation rotateX = AnimationUtils.loadAnimation(main, R.anim.fab_rotate_to_x);
-        Animation rotatePlus = AnimationUtils.loadAnimation(main, R.anim.fab_rotate_to_plus);
+        createPersonArray();
 
         split_card.animate().alpha(0f).translationY(-100f);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             removeFABPlusOutline(fab_plus);
         }
 
-        setButtons(rootView, rotatePlus, rotateX);
+        setButtons(rootView);
 
         return rootView;
     }
@@ -290,9 +302,37 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
             public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
         });
+
+        ((TextView) sales_tax).addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                try {
+                    if (s.length() != 0) {
+                        tax = Double.parseDouble(((TextView) sales_tax).getText().toString());
+                    } else {
+                        tax = 0;
+                    }
+                } catch (NumberFormatException e) {
+//                    Log.d(LOG_TAG, e.getMessage());
+                }
+            }
+        });
     }
 
-    private void setButtons(View rootView, final Animation rotatePlus, final Animation rotateX) {
+    private void setButtons(View rootView) {
+
+        final Animation rotateX = AnimationUtils.loadAnimation(main, R.anim.fab_rotate_to_x);
+        final Animation rotatePlus = AnimationUtils.loadAnimation(main, R.anim.fab_rotate_to_plus);
 
         final Button clear_button = (Button) rootView.findViewById(R.id.clear_button);
         clear_button.setOnClickListener(new View.OnClickListener() {
@@ -309,7 +349,9 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
                 tip = 0;
                 total = 0;
                 people = defPeople;
+                createPersonArray();
                 recalculate = true;
+
                 if (split_card.isShown())
                     hideCard(rotatePlus);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -353,6 +395,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
             @Override
             public void onClick(View v) {
                 people++;
+                addPersonToList();
                 setPeople();
                 calcSplits();
             }
@@ -363,6 +406,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
             public void onClick(View v) {
                 if (people > defPeople) {
                     people--;
+                    removePersonFromList();
                 } else {
                     hideCard(rotatePlus);
                     people = defPeople;
@@ -498,42 +542,80 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
     }
 
     private void calcSplits() {
-        splitTip = tip / people;
-        splitTotal = total / people;
+        if (rootView.findViewById(R.id.even_split_content).getVisibility() == View.VISIBLE) {
+            splitTip = tip / people;
+            splitTotal = total / people;
 
-        ((TextView) split_tip).setText(unitSymbol + String.format("%.2f", splitTip) + rootView.getResources().getString(R.string.tip_per));
-        ((TextView) split_total).setText(unitSymbol + String.format("%.2f", splitTotal));
+            ((TextView) split_tip).setText(unitSymbol + String.format("%.2f", splitTip) + rootView.getResources().getString(R.string.tip_per));
+            ((TextView) split_total).setText(unitSymbol + String.format("%.2f", splitTotal));
+        }
+
+        if (rootView.findViewById(R.id.uneven_split_content).getVisibility() == View.VISIBLE) {
+
+        }
     }
 
-    @TargetApi(21) // Remove the drop shadow from the + drawable
-    private void removeFABPlusOutline(View plusView) {
-        ViewOutlineProvider viewOutlineProvider = new ViewOutlineProvider() {
-            @Override
-            public void getOutline(View view, Outline outline) {
-                view.setOutlineProvider(null);
-            }
-        };
-        plusView.setOutlineProvider(viewOutlineProvider);
+    private void createPersonArray() {
+        peopleList.clear();
+        people_layout.removeAllViews();
+
+        TableRow TR = new TableRow(rootView.getContext());
+        TR.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+
+        TextView num = new TextView(rootView.getContext());
+        num.setText("Person");
+
+        TextView sub = new TextView(rootView.getContext());
+        sub.setText("Items Ordered");
+        sub.setGravity(Gravity.CENTER);
+        sub.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1f));
+
+        TextView tot = new TextView(rootView.getContext());
+        tot.setText("Total");
+        tot.setGravity(Gravity.CENTER);
+        tot.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1f));
+
+        TR.addView(num);
+        TR.addView(sub);
+        TR.addView(tot);
+
+        people_layout.addView(TR);
+
+        for (int i = 0; i < defPeople; i++) {
+            addPersonToList();
+        }
     }
 
-    @TargetApi(21) // Material ripple to clear the card
-    private void clearReveal(Button source) {
-        LinearLayout.LayoutParams shift = (LinearLayout.LayoutParams) calculator_card.getLayoutParams();
+    private void addPersonToList() {
+        peopleList.add(new Person());
 
-        int centerX = ((source.getLeft() + source.getRight()) / 2)
-                + shift.leftMargin;
-        int centerY = (calculator_card.getBottom() - (source.getHeight() / 2))
-                - (shift.topMargin + calculator_card.getPaddingBottom());
-        int radius = (int) Math.sqrt(Math.pow(calculator_card.getWidth(), 2) + Math.pow(calculator_card.getHeight(), 2));
+        TableRow TR = new TableRow(rootView.getContext());
+        TR.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
 
-        Animator reveal = ViewAnimationUtils.createCircularReveal(
-                calculator_card,
-                centerX,
-                centerY,
-                0,
-                radius);
-        reveal.setDuration(400);
-        reveal.start();
+        TextView num = new TextView(rootView.getContext());
+        num.setText(Integer.toString(peopleList.size()));
+        num.setGravity(Gravity.CENTER);
+
+        EditText sub = new EditText(rootView.getContext());
+        sub.setRawInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        sub.setHint("Subtotal");
+        sub.setGravity(Gravity.CENTER);
+        sub.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1f));
+
+        TextView tot = new TextView(rootView.getContext());
+        tot.setText(unitSymbol + "0.00");
+        tot.setGravity(Gravity.CENTER);
+        tot.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1f));
+
+        TR.addView(num);
+        TR.addView(sub);
+        TR.addView(tot);
+        people_layout.addView(TR);
+    }
+
+    private void removePersonFromList() {
+        people_layout.removeViewAt(people_layout.getChildCount()-1);
+        peopleList.remove(peopleList.size()-1);
     }
 
     private void showCard(Animation animation) {
@@ -565,6 +647,37 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
                 split_card.setVisibility(View.GONE);
             }
         });
+    }
+
+    @TargetApi(21) // Remove the drop shadow from the + drawable
+    private void removeFABPlusOutline(View plusView) {
+        ViewOutlineProvider viewOutlineProvider = new ViewOutlineProvider() {
+            @Override
+            public void getOutline(View view, Outline outline) {
+                view.setOutlineProvider(null);
+            }
+        };
+        plusView.setOutlineProvider(viewOutlineProvider);
+    }
+
+    @TargetApi(21) // Material ripple to clear the card
+    private void clearReveal(Button source) {
+        LinearLayout.LayoutParams shift = (LinearLayout.LayoutParams) calculator_card.getLayoutParams();
+
+        int centerX = ((source.getLeft() + source.getRight()) / 2)
+                + shift.leftMargin;
+        int centerY = (calculator_card.getBottom() - (source.getHeight() / 2))
+                - (shift.topMargin + calculator_card.getPaddingBottom());
+        int radius = (int) Math.sqrt(Math.pow(calculator_card.getWidth(), 2) + Math.pow(calculator_card.getHeight(), 2));
+
+        Animator reveal = ViewAnimationUtils.createCircularReveal(
+                calculator_card,
+                centerX,
+                centerY,
+                0,
+                radius);
+        reveal.setDuration(400);
+        reveal.start();
     }
 
     private void hideKeyboard() {
