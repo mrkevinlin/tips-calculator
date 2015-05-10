@@ -14,9 +14,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.AppCompatSpinner;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextWatcher;
-import android.view.Gravity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,11 +29,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -55,13 +52,16 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
     public AppCompatSpinner spinner;
     public ArrayAdapter<String> adapter;
     public String prefUnitKey, prefPeopleKey, prefPercentsKey, prefDefaultKey, unitSymbol, peoplePref,
-            percentString, addPercentString, defaultPercent;
-    public double sale, percent, tip, total, splitTip, splitTotal, tax, taxRate;
+            percentString, addPercentString, defaultPercent, prefTaxKey;
+    public double sale, percent, tip, total, splitTip, splitTotal, tax, taxRate, defTaxRate;
     public int people, defPeople, percent_array_length, spinnerPosition;
     public int defaultIndex = 0;
     boolean recalculate = true;
     boolean rounding = false;
     boolean isUnevenShown = false;
+    boolean enteredTaxRate = false;
+    boolean recalculateTax = true;
+    float scaleValue;
 
     public CalculatorFragment() {
     }
@@ -73,10 +73,13 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
 
         rootView = inflater.inflate(R.layout.fragment_calculator, container, false);
 
+        scaleValue = rootView.getContext().getResources().getDisplayMetrics().density;
+
         prefUnitKey = main.getString(R.string.pref_unit_key);
         prefPeopleKey = main.getString(R.string.pref_people_key);
         prefPercentsKey = main.getString(R.string.pref_percents_key);
         prefDefaultKey = main.getString(R.string.pref_default_key);
+        prefTaxKey = main.getString(R.string.pref_tax_key);
 
         spinner = (AppCompatSpinner) rootView.findViewById(R.id.percent_amount_spinner);
         adapter = new ArrayAdapter<>(main, R.layout.spinner_item, percentsArray);
@@ -87,6 +90,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         setUnitPreference(preferences);
         setSpinnerPreferences(preferences);
         setPeoplePreference(preferences);
+        setTaxPreference(preferences);
 
         prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
@@ -99,6 +103,8 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
                     setSpinnerPreferences(sharedPreferences);
                 } else if (key.equals(prefDefaultKey)) {
                     setDefaultPreference(sharedPreferences);
+                } else if (key.equals(prefTaxKey)) {
+                    setTaxPreference(sharedPreferences);
                 }
             }
         };
@@ -150,6 +156,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         ((TextView) rootView.findViewById(R.id.dollar1)).setText(unitSymbol);
         ((TextView) rootView.findViewById(R.id.dollar2)).setText(unitSymbol);
         ((TextView) rootView.findViewById(R.id.dollar3)).setText(unitSymbol);
+        ((TextView) rootView.findViewById(R.id.dollar4)).setText(unitSymbol);
     }
 
     private void setSpinnerPreferences(SharedPreferences sp) {
@@ -200,6 +207,18 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         percent_array_length = toSpinnerPercentsArray.size();
 
         populateSpinner();
+    }
+
+    private void setTaxPreference(SharedPreferences sp) {
+        defTaxRate = Double.parseDouble(sp.getString(main.getString(R.string.pref_tax_key), main.getString(R.string.pref_tax_default))) / 100;
+
+        if (defTaxRate != Double.parseDouble(main.getString(R.string.pref_tax_default))) {
+            enteredTaxRate = true;
+        } else {
+            enteredTaxRate = false;
+        }
+
+        taxRate = defTaxRate;
     }
 
     private void populateSpinner() {
@@ -317,10 +336,14 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
             @Override
             public void afterTextChanged(Editable s) {
                 try {
-                    if (s.length() != 0) {
-                        tax = Double.parseDouble(((TextView) sales_tax).getText().toString());
-                    } else {
-                        tax = 0;
+                    if (recalculateTax) {
+                        if (s.length() != 0) {
+                            tax = Double.parseDouble(((TextView) sales_tax).getText().toString());
+
+                            calculateTaxRate();
+                        } else {
+                            resetTaxRate();
+                        }
                     }
                 } catch (NumberFormatException e) {
 //                    Log.d(LOG_TAG, e.getMessage());
@@ -350,6 +373,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
                 total = 0;
                 people = defPeople;
                 createPersonArray();
+                resetTaxRate();
                 recalculate = true;
 
                 if (split_card.isShown())
@@ -367,7 +391,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
                 if (total != 0) {
                     ((TextView) total_text).setText(String.format("%.2f", (double) Math.round(total)));
                     rounding = true;
-                    if (split_card.isShown()) {
+                    if (even_content.isShown()) {
                         calcSplits();
                     }
                 }
@@ -404,7 +428,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         take_people.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (people > defPeople) {
+                if (people > 2) {
                     people--;
                     removePersonFromList();
                 } else {
@@ -469,19 +493,48 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         percentDialog.show(fm, "custom_percent_dialog");
     }
 
+    private void calculateTaxRate() {
+//        && !enteredTaxRate
+        if (sale != 0 && taxRate == 0) {
+            taxRate = tax / (sale - tax);
+        }
+        Log.d(LOG_TAG, "Tax rate: " + Double.toString(taxRate));
+    }
+
+    private void resetTaxRate() {
+        taxRate = defTaxRate;
+        setSalesTax();
+    }
+
+    private void setSalesTax() {
+        recalculateTax = false;
+        if (sale != 0 && taxRate != 0) {
+            tax = (sale * taxRate) / (1 + taxRate);
+            ((TextView) sales_tax).setText(String.format("%.2f", tax));
+        } else {
+            tax = 0;
+            ((TextView) sales_tax).setText("");
+        }
+        recalculateTax = true;
+    }
+
     private void saleChanged() {
         if (percent != 0 && recalculate) {
             recalculate = false;
             tip = sale * (percent / 100);
             total = sale + tip;
 
+            calculateTaxRate();
+            setSalesTax();
+
             ((TextView) tip_text).setText(String.format("%.2f", tip));
             ((TextView) total_text).setText(String.format("%.2f", total));
 
-            if (split_card.isShown()) {
-                calcSplits();
-            }
             recalculate = true;
+        }
+
+        if (even_content.isShown()) {
+            calcSplits();
         }
 
     }
@@ -495,10 +548,11 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
             ((TextView) tip_text).setText(String.format("%.2f", tip));
             ((TextView) total_text).setText(String.format("%.2f", total));
 
-            if (split_card.isShown()) {
-                calcSplits();
-            }
             recalculate = true;
+        }
+
+        if (even_content.isShown()) {
+            calcSplits();
         }
     }
 
@@ -512,10 +566,11 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
             addPercentToSpinner(percent, true);
             ((TextView) total_text).setText(String.format("%.2f", total));
 
-            if (split_card.isShown()) {
-                calcSplits();
-            }
             recalculate = true;
+        }
+
+        if (even_content.isShown()) {
+            calcSplits();
         }
     }
 
@@ -531,7 +586,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
             recalculate = true;
         }
 
-        if (split_card.isShown()) {
+        if (even_content.isShown()) {
             calcSplits();
         }
 
@@ -549,37 +604,53 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
             ((TextView) split_tip).setText(unitSymbol + String.format("%.2f", splitTip) + rootView.getResources().getString(R.string.tip_per));
             ((TextView) split_total).setText(unitSymbol + String.format("%.2f", splitTotal));
         }
-
-        if (rootView.findViewById(R.id.uneven_split_content).getVisibility() == View.VISIBLE) {
-
-        }
     }
 
     private void createPersonArray() {
         peopleList.clear();
         people_layout.removeAllViews();
 
-        TableRow TR = new TableRow(rootView.getContext());
-        TR.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+        LayoutInflater LI = (LayoutInflater) rootView.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LI.inflate(R.layout.table_row_title, people_layout);
 
-        TextView num = new TextView(rootView.getContext());
-        num.setText("Person");
+//        TextView numbertv = (TextView) labels.findViewById(R.id.person_number);
+//        numbertv.setText("Person");
+//
+//        TextView subtotaltv = (TextView) labels.findViewById(R.id.person_subtotal);
+//        subtotaltv.setText("Items Ordered");
+//        subtotaltv.setTextColor(main.getResources().getColor(R.color.blue));
+//
+//        TextView totaltv = (TextView) labels.findViewById(R.id.person_total);
+//        totaltv.setText("Total");
+//        totaltv.setTextColor(main.getResources().getColor(R.color.green));
+//
+//        people_layout.addView(labels);
 
-        TextView sub = new TextView(rootView.getContext());
-        sub.setText("Items Ordered");
-        sub.setGravity(Gravity.CENTER);
-        sub.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1f));
-
-        TextView tot = new TextView(rootView.getContext());
-        tot.setText("Total");
-        tot.setGravity(Gravity.CENTER);
-        tot.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1f));
-
-        TR.addView(num);
-        TR.addView(sub);
-        TR.addView(tot);
-
-        people_layout.addView(TR);
+//        TableRow TR = new TableRow(rootView.getContext());
+//        TR.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+//        int pad = (int) (16 * scaleValue);
+//        TR.setPadding(pad, pad, pad, pad);
+//
+//        TextView num = new TextView(rootView.getContext());
+//        num.setText("Person");
+//
+//        TextView sub = new TextView(rootView.getContext());
+//        sub.setText("Items Ordered");
+//        sub.setTextColor(main.getResources().getColor(R.color.blue));
+//        sub.setGravity(Gravity.CENTER);
+//        sub.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 3f));
+//
+//        TextView tot = new TextView(rootView.getContext());
+//        tot.setText("Total");
+//        tot.setTextColor(main.getResources().getColor(R.color.green));
+//        tot.setGravity(Gravity.CENTER);
+//        tot.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 2f));
+//
+//        TR.addView(num);
+//        TR.addView(sub);
+//        TR.addView(tot);
+//
+//        people_layout.addView(TR);
 
         for (int i = 0; i < defPeople; i++) {
             addPersonToList();
@@ -589,33 +660,57 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
     private void addPersonToList() {
         peopleList.add(new Person());
 
-        TableRow TR = new TableRow(rootView.getContext());
-        TR.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+        LayoutInflater LI = (LayoutInflater) rootView.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View v = LI.inflate(R.layout.table_row_person, null);
 
-        TextView num = new TextView(rootView.getContext());
-        num.setText(Integer.toString(peopleList.size()));
-        num.setGravity(Gravity.CENTER);
+        TextView numbertv = (TextView) v.findViewById(R.id.person_number);
+        numbertv.setText(Integer.toString(peopleList.size()));
 
-        EditText sub = new EditText(rootView.getContext());
-        sub.setRawInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        sub.setHint("Subtotal");
-        sub.setGravity(Gravity.CENTER);
-        sub.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1f));
+        TextView totaltv = (TextView) v.findViewById(R.id.person_total);
+        totaltv.setText(unitSymbol + "0.00");
 
-        TextView tot = new TextView(rootView.getContext());
-        tot.setText(unitSymbol + "0.00");
-        tot.setGravity(Gravity.CENTER);
-        tot.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1f));
+        people_layout.addView(v);
 
-        TR.addView(num);
-        TR.addView(sub);
-        TR.addView(tot);
-        people_layout.addView(TR);
+//        TableRow TR = new TableRow(rootView.getContext());
+//        TR.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+//        int pad = (int) (16 * scaleValue);
+//        TR.setPadding(pad, 0, pad, pad);
+//
+//        TextView num = new TextView(rootView.getContext());
+//        num.setText(Integer.toString(peopleList.size()));
+//        num.setGravity(Gravity.CENTER);
+//
+//        TableRow.LayoutParams LP = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 2f);
+//
+//        TextView tot = new TextView(rootView.getContext());
+//        tot.setText(unitSymbol + "0.00");
+//        tot.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
+//        tot.setGravity(Gravity.CENTER);
+//        tot.setLayoutParams(LP);
+//
+//        LP = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 3f);
+//
+//        com.rengwuxian.materialedittext.MaterialEditText sub = new com.rengwuxian.materialedittext.MaterialEditText(rootView.getContext());
+//        sub.setRawInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+//        sub.setSingleLine();
+//        sub.setTextColor(main.getResources().getColor(R.color.blue_gray));
+//        sub.setHint("Subtotal");
+//        sub.setGravity(Gravity.CENTER);
+//        int marg = (int) (16 * scaleValue);
+//        LP.setMargins(marg, 0, marg, 0);
+//        sub.setLayoutParams(LP);
+//
+//        TR.addView(num);
+//        TR.addView(sub);
+//        TR.addView(tot);
+//        people_layout.addView(TR);
+
+//        Log.d(LOG_TAG, Integer.toString(people_layout.getChildCount()));
     }
 
     private void removePersonFromList() {
-        people_layout.removeViewAt(people_layout.getChildCount()-1);
-        peopleList.remove(peopleList.size()-1);
+        people_layout.removeViewAt(people_layout.getChildCount() - 1);
+        peopleList.remove(peopleList.size() - 1);
     }
 
     private void showCard(Animation animation) {

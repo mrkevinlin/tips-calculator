@@ -39,4 +39,13 @@
         android:singleLine="true"
         android:title="@string/pref_unit_label" />
 
+    <EditTextPreference
+        android:defaultValue="@string/pref_tax_default"
+        android:dialogMessage="@string/pref_tax_message"
+        android:dialogTitle="@string/pref_tax_title"
+        android:inputType="numberDecimal"
+        android:key="@string/pref_tax_key"
+        android:singleLine="true"
+        android:title="@string/pref_tax_label" />
+
 </PreferenceScreen>

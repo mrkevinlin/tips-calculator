@@ -2,7 +2,7 @@
     <string name="app_name">Tip Calculator</string>
 
     <string name="dollar">$</string>
-    <string name="sale_text">Subtotal</string>
+    <string name="sale_text">Sale</string>
     <string name="tip_amt_text">Tip</string>
     <string name="total_text">Total</string>
     <string name="action_about">Help and feedback</string>
@@ -17,7 +17,8 @@
     <string name="add" translatable="false">\u002b</string>
     <string name="subtract" translatable="false">\u2014</string>
 
-    <string name="split_check_title">Split the check among</string>
+    <string name="split_check_title_even">Split the check among</string>
+    <string name="split_check_title_uneven">Calculate individual totals for</string>
     <string name="people">\u0020people</string>
     <string name="per_person">\u0020per person</string>
     <string name="tip_per">\u0020from tips</string>
@@ -36,17 +37,23 @@
     <string name="pref_percents_message">List numbers separated by commas.</string>
     <string name="pref_percents_title">Choose the default % values</string>
 
-    <string name="pref_people_label">Starting number for check splitting</string>
+    <string name="pref_people_label">Default split check count</string>
     <string name="pref_people_key" translatable="false">people</string>
     <string name="pref_people_default" translatable="false">2</string>
-    <string name="pref_people_message">2 people minimum</string>
-    <string name="pref_people_title">How many people?</string>
+    <string name="pref_people_message">First number of people displayed when splitting the check. 2 people minimum</string>
+    <string name="pref_people_title">Enter how many people</string>
 
     <string name="pref_default_label">Default percent value</string>
     <string name="pref_default_key" translatable="false">default</string>
     <string name="pref_default_default" translatable="false">15</string>
-    <string name="pref_default_message">This is default selected percent.</string>
+    <string name="pref_default_message">This is the percentage selected by default.</string>
     <string name="pref_default_title">Enter a number</string>
+
+    <string name="pref_tax_label">Sales tax rate</string>
+    <string name="pref_tax_key" translatable="false">tax</string>
+    <string name="pref_tax_default" translatable="false">0</string>
+    <string name="pref_tax_message">Put the restaurant sales tax for your area as a percentage (like 8.25).</string>
+    <string name="pref_tax_title">Enter sales tax</string>
 
     <string name="general_help_text">Enter in the amount of the sale, and then filling any other
         blank will cause the rest to calculate.</string>

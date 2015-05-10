@@ -11,6 +11,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public final String percent_key = "percents";
     public final String people_key = "people";
     public final String default_key = "default";
+    public final String tax_key = "tax";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -23,6 +24,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         onSharedPreferenceChanged(sp, percent_key);
         onSharedPreferenceChanged(sp, default_key);
         onSharedPreferenceChanged(sp, people_key);
+        onSharedPreferenceChanged(sp, tax_key);
     }
 
     @Override

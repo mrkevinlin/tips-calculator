@@ -159,7 +159,8 @@
                                 android:layout_height="wrap_content"
                                 android:layout_alignParentTop="true"
                                 android:layout_centerHorizontal="true"
-                                android:text="@string/split_check_title" />
+                                android:text="@string/split_check_title_even" />
+                            <!-- Todo: switch text depending on equal or unequal-->
 
                             <Button
                                 android:id="@+id/take_people"
@@ -198,7 +199,8 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:orientation="vertical"
-                            android:padding="24dp">
+                            android:padding="24dp"
+                            android:visibility="gone"> <!--Todo: remove this line when implemented split button view switch-->
 
                             <TextView
                                 android:id="@+id/split_total"
@@ -223,28 +225,43 @@
 
                         </LinearLayout>
 
-                        <LinearLayout
+                        <RelativeLayout
                             android:id="@+id/uneven_split_content"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical">
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:id="@+id/dollar4"
+                                style="@style/DollarStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignBottom="@+id/sales_tax"
+                                android:layout_alignParentLeft="true"
+                                android:paddingBottom="12dp"
+                                android:paddingRight="4dp"
+                                android:text="@string/dollar" />
 
                             <com.rengwuxian.materialedittext.MaterialEditText
                                 android:id="@+id/sales_tax"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_alignParentTop="true"
+                                android:layout_toRightOf="@+id/dollar4"
+                                android:gravity="center"
                                 android:hint="Sales Tax"
-                                android:inputType="numberDecimal" />
+                                android:inputType="numberDecimal"
+                                app:met_floatingLabel="highlight"
+                                app:met_underlineColor="@color/gray" />
 
                             <TableLayout
                                 android:id="@+id/people_list"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="vertical">
+                                android:layout_alignParentLeft="true"
+                                android:layout_below="@id/sales_tax"
+                                android:orientation="vertical" />
 
-                            </TableLayout>
-
-                        </LinearLayout>
+                        </RelativeLayout>
 
                     </LinearLayout>
 
