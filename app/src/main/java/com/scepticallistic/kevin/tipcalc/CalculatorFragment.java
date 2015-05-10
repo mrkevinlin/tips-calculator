@@ -34,6 +34,8 @@ import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import com.rengwuxian.materialedittext.MaterialEditText;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -496,7 +498,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
     private void calculateTaxRate() {
 //        && !enteredTaxRate
         if (sale != 0 && taxRate == 0) {
-            taxRate = tax / (sale - tax);
+            taxRate = tax / (sale - tax); //Todo: Entering in a value to calculate taxRate is inaccurate?
         }
         Log.d(LOG_TAG, "Tax rate: " + Double.toString(taxRate));
     }
@@ -613,45 +615,6 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         LayoutInflater LI = (LayoutInflater) rootView.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         LI.inflate(R.layout.table_row_title, people_layout);
 
-//        TextView numbertv = (TextView) labels.findViewById(R.id.person_number);
-//        numbertv.setText("Person");
-//
-//        TextView subtotaltv = (TextView) labels.findViewById(R.id.person_subtotal);
-//        subtotaltv.setText("Items Ordered");
-//        subtotaltv.setTextColor(main.getResources().getColor(R.color.blue));
-//
-//        TextView totaltv = (TextView) labels.findViewById(R.id.person_total);
-//        totaltv.setText("Total");
-//        totaltv.setTextColor(main.getResources().getColor(R.color.green));
-//
-//        people_layout.addView(labels);
-
-//        TableRow TR = new TableRow(rootView.getContext());
-//        TR.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-//        int pad = (int) (16 * scaleValue);
-//        TR.setPadding(pad, pad, pad, pad);
-//
-//        TextView num = new TextView(rootView.getContext());
-//        num.setText("Person");
-//
-//        TextView sub = new TextView(rootView.getContext());
-//        sub.setText("Items Ordered");
-//        sub.setTextColor(main.getResources().getColor(R.color.blue));
-//        sub.setGravity(Gravity.CENTER);
-//        sub.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 3f));
-//
-//        TextView tot = new TextView(rootView.getContext());
-//        tot.setText("Total");
-//        tot.setTextColor(main.getResources().getColor(R.color.green));
-//        tot.setGravity(Gravity.CENTER);
-//        tot.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 2f));
-//
-//        TR.addView(num);
-//        TR.addView(sub);
-//        TR.addView(tot);
-//
-//        people_layout.addView(TR);
-
         for (int i = 0; i < defPeople; i++) {
             addPersonToList();
         }
@@ -666,46 +629,37 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         TextView numbertv = (TextView) v.findViewById(R.id.person_number);
         numbertv.setText(Integer.toString(peopleList.size()));
 
-        TextView totaltv = (TextView) v.findViewById(R.id.person_total);
+        final TextView totaltv = (TextView) v.findViewById(R.id.person_total);
         totaltv.setText(unitSymbol + "0.00");
 
+        //Todo: Move to a function so can recall multiple times upon updating of other values (taxrate and percent).
+        //Todo: Calculate last subtotal based on the sale value???
+        final MaterialEditText subtotalv = ((MaterialEditText) v.findViewById(R.id.person_subtotal));
+        subtotalv.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                try {
+                    double personTotal = Double.parseDouble(s.toString());
+                    personTotal = personTotal * (1+taxRate);
+                    personTotal = (personTotal * (1 + (percent / 100)));
+                    totaltv.setText(unitSymbol + String.format("%.2f", personTotal));
+                } catch (NumberFormatException e) {
+
+                }
+            }
+        });
+
         people_layout.addView(v);
-
-//        TableRow TR = new TableRow(rootView.getContext());
-//        TR.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-//        int pad = (int) (16 * scaleValue);
-//        TR.setPadding(pad, 0, pad, pad);
-//
-//        TextView num = new TextView(rootView.getContext());
-//        num.setText(Integer.toString(peopleList.size()));
-//        num.setGravity(Gravity.CENTER);
-//
-//        TableRow.LayoutParams LP = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 2f);
-//
-//        TextView tot = new TextView(rootView.getContext());
-//        tot.setText(unitSymbol + "0.00");
-//        tot.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
-//        tot.setGravity(Gravity.CENTER);
-//        tot.setLayoutParams(LP);
-//
-//        LP = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 3f);
-//
-//        com.rengwuxian.materialedittext.MaterialEditText sub = new com.rengwuxian.materialedittext.MaterialEditText(rootView.getContext());
-//        sub.setRawInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-//        sub.setSingleLine();
-//        sub.setTextColor(main.getResources().getColor(R.color.blue_gray));
-//        sub.setHint("Subtotal");
-//        sub.setGravity(Gravity.CENTER);
-//        int marg = (int) (16 * scaleValue);
-//        LP.setMargins(marg, 0, marg, 0);
-//        sub.setLayoutParams(LP);
-//
-//        TR.addView(num);
-//        TR.addView(sub);
-//        TR.addView(tot);
-//        people_layout.addView(TR);
-
-//        Log.d(LOG_TAG, Integer.toString(people_layout.getChildCount()));
     }
 
     private void removePersonFromList() {
