@@ -6,20 +6,20 @@
 
     <TextView
         android:gravity="center"
-        android:text="Person" />
+        android:text="@string/person_list_title_person" />
 
     <TextView
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_weight="3"
         android:gravity="center"
-        android:text="Items Ordered"
+        android:text="@string/person_list_title_items"
         android:textColor="@color/blue" />
 
     <TextView
         android:layout_weight="2"
         android:gravity="center"
-        android:text="Total"
+        android:text="@string/total_text"
         android:textColor="@color/green"/>
 
 </TableRow>

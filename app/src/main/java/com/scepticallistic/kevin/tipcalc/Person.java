@@ -12,15 +12,25 @@ public class Person {
     }
 
     public void setTaxAmount(double tax) {
-        taxAmount = tax;
+        taxAmount = subtotal * tax;
     }
 
     public void setTipAmount(double tip) {
-        tipAmount = tip;
+        tipAmount = (subtotal + taxAmount) * tip;
     }
 
-    public double calculateTotal() {
+    public double getSubtotal() {
+        return subtotal;
+    }
+
+    public void setAllValues(double sub, double tax, double tip) {
+        subtotal = sub;
+        taxAmount = sub * tax;
+        tipAmount = (subtotal + taxAmount) * tip;
+    }
+
+    public String calculateTotal() {
         total = subtotal + taxAmount + tipAmount;
-        return total;
+        return String.format("%.2f", total);
     }
 }

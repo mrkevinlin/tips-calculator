@@ -17,7 +17,7 @@
         android:layout_marginRight="16dp"
         android:layout_weight="3"
         android:gravity="center"
-        android:hint="Subtotal"
+        android:hint="@string/person_list_subtotal"
         android:inputType="numberDecimal"
         android:singleLine="true"
         app:met_textColor="@color/blue_gray" />

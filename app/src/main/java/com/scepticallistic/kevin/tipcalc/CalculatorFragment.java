@@ -15,7 +15,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.AppCompatSpinner;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -214,11 +213,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
     private void setTaxPreference(SharedPreferences sp) {
         defTaxRate = Double.parseDouble(sp.getString(main.getString(R.string.pref_tax_key), main.getString(R.string.pref_tax_default))) / 100;
 
-        if (defTaxRate != Double.parseDouble(main.getString(R.string.pref_tax_default))) {
-            enteredTaxRate = true;
-        } else {
-            enteredTaxRate = false;
-        }
+        enteredTaxRate = defTaxRate != Double.parseDouble(main.getString(R.string.pref_tax_default));
 
         taxRate = defTaxRate;
     }
@@ -341,8 +336,13 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
                     if (recalculateTax) {
                         if (s.length() != 0) {
                             tax = Double.parseDouble(((TextView) sales_tax).getText().toString());
-
-                            calculateTaxRate();
+                            if (enteredTaxRate) {
+                                enteredTaxRate = false;
+                                calculateTaxRate();
+                                enteredTaxRate = true;
+                            } else {
+                                calculateTaxRate();
+                            }
                         } else {
                             resetTaxRate();
                         }
@@ -496,19 +496,18 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
     }
 
     private void calculateTaxRate() {
-//        && !enteredTaxRate
-        if (sale != 0 && taxRate == 0) {
-            taxRate = tax / (sale - tax); //Todo: Entering in a value to calculate taxRate is inaccurate?
+        if (sale != 0 && !enteredTaxRate) {
+            taxRate = tax / (sale - tax);
         }
-        Log.d(LOG_TAG, "Tax rate: " + Double.toString(taxRate));
+        updateAllPersonValues();
     }
 
     private void resetTaxRate() {
         taxRate = defTaxRate;
-        setSalesTax();
+        calculateSalesTax();
     }
 
-    private void setSalesTax() {
+    private void calculateSalesTax() {
         recalculateTax = false;
         if (sale != 0 && taxRate != 0) {
             tax = (sale * taxRate) / (1 + taxRate);
@@ -526,9 +525,6 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
             tip = sale * (percent / 100);
             total = sale + tip;
 
-            calculateTaxRate();
-            setSalesTax();
-
             ((TextView) tip_text).setText(String.format("%.2f", tip));
             ((TextView) total_text).setText(String.format("%.2f", total));
 
@@ -537,6 +533,9 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
 
         if (even_content.isShown()) {
             calcSplits();
+        } else if (uneven_content.isShown()) {
+            calculateTaxRate();
+            calculateSalesTax();
         }
 
     }
@@ -555,6 +554,8 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
 
         if (even_content.isShown()) {
             calcSplits();
+        } else if (uneven_content.isShown()) {
+            updateAllPersonValues();
         }
     }
 
@@ -573,6 +574,8 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
 
         if (even_content.isShown()) {
             calcSplits();
+        } else if (uneven_content.isShown()) {
+            updateAllPersonValues();
         }
     }
 
@@ -590,6 +593,8 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
 
         if (even_content.isShown()) {
             calcSplits();
+        } else if (uneven_content.isShown()) {
+            updateAllPersonValues();
         }
 
     }
@@ -632,7 +637,6 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         final TextView totaltv = (TextView) v.findViewById(R.id.person_total);
         totaltv.setText(unitSymbol + "0.00");
 
-        //Todo: Move to a function so can recall multiple times upon updating of other values (taxrate and percent).
         //Todo: Calculate last subtotal based on the sale value???
         final MaterialEditText subtotalv = ((MaterialEditText) v.findViewById(R.id.person_subtotal));
         subtotalv.addTextChangedListener(new TextWatcher() {
@@ -649,17 +653,40 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
             @Override
             public void afterTextChanged(Editable s) {
                 try {
-                    double personTotal = Double.parseDouble(s.toString());
-                    personTotal = personTotal * (1+taxRate);
-                    personTotal = (personTotal * (1 + (percent / 100)));
-                    totaltv.setText(unitSymbol + String.format("%.2f", personTotal));
+                    if (s.length()!=0) {
+                        double personSub = Double.parseDouble(s.toString());
+                        updatePersonValues(findPersonRow(subtotalv), personSub);
+                    } else {
+                        updatePersonValues(findPersonRow(subtotalv), 0);
+                    }
                 } catch (NumberFormatException e) {
-
+//                    Log.d(LOG_TAG, e.getMessage());
                 }
             }
         });
 
         people_layout.addView(v);
+    }
+
+    private int findPersonRow(View v) {
+        for (int i = 0; i < people_layout.getChildCount(); i++) {
+            if (v.getParent().equals(people_layout.getChildAt(i))) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    private void updatePersonValues(int index, double sub) {
+        Person current = peopleList.get(index - 1);
+        current.setAllValues(sub, taxRate, percent / 100);
+        ((TextView) people_layout.getChildAt(index).findViewById(R.id.person_total)).setText(unitSymbol + current.calculateTotal());
+    }
+
+    private void updateAllPersonValues() {
+        for (int i = 1; i <= peopleList.size(); i++) {
+            updatePersonValues(i, peopleList.get(i-1).getSubtotal());
+        }
     }
 
     private void removePersonFromList() {

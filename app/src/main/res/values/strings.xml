@@ -23,6 +23,10 @@
     <string name="per_person">\u0020per person</string>
     <string name="tip_per">\u0020from tips</string>
 
+    <string name="person_list_title_person">Person</string>
+    <string name="person_list_title_items">Item Prices</string>
+    <string name="person_list_subtotal">Subtotal</string>
+
     <string name="settings_text">Settings</string>
 
     <string name="pref_unit_label">Unit of currency</string>
