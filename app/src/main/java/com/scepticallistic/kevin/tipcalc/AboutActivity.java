@@ -21,6 +21,9 @@ public class AboutActivity extends AppCompatActivity {
         TextView splitView = (TextView)findViewById(R.id.split_help);
         splitView.setText(Html.fromHtml(getString(R.string.split_help_text)));
 
+        TextView unevenView = (TextView)findViewById(R.id.uneven_split_help);
+        unevenView.setText(Html.fromHtml(getString(R.string.uneven_help_text)));
+
         Button feedback = (Button) findViewById(R.id.feedback_button);
         feedback.setOnClickListener(new View.OnClickListener() {
             @Override

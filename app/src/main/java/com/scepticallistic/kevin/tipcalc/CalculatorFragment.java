@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
+import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
@@ -43,8 +44,8 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
     public SharedPreferences preferences;
     public SharedPreferences.OnSharedPreferenceChangeListener prefListener;
     public Activity main;
-    public View rootView, scroll_view, calculator_card, sale_text, tip_text, total_text, fab_plus,
-            split_card, people_count, split_tip, split_total, even_content, uneven_content, sales_tax;
+    public View rootView, scroll_view, calculator_card, sale_text, tip_text, total_text, fab_plus, split_card,
+            people_count, split_title, split_tip, split_total, even_content, uneven_content, sales_tax, split_type;
     public TableLayout people_layout;
     private static final ArrayList<String> percentsArray = new ArrayList<>();
     private static final ArrayList<String> defaultPercentsArray = new ArrayList<>();
@@ -59,10 +60,9 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
     public int defaultIndex = 0;
     boolean recalculate = true;
     boolean rounding = false;
-    boolean isUnevenShown = false;
+    boolean unevenShown = false;
     boolean enteredTaxRate = false;
     boolean recalculateTax = true;
-    float scaleValue;
 
     public CalculatorFragment() {
     }
@@ -73,8 +73,6 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         main = getActivity();
 
         rootView = inflater.inflate(R.layout.fragment_calculator, container, false);
-
-        scaleValue = rootView.getContext().getResources().getDisplayMetrics().density;
 
         prefUnitKey = main.getString(R.string.pref_unit_key);
         prefPeopleKey = main.getString(R.string.pref_people_key);
@@ -119,15 +117,16 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         split_card = rootView.findViewById(R.id.split_card);
         fab_plus = rootView.findViewById(R.id.fab_plus);
         people_count = rootView.findViewById(R.id.people_count);
+        split_title = rootView.findViewById(R.id.split_title);
         split_tip = rootView.findViewById(R.id.split_tip);
         split_total = rootView.findViewById(R.id.split_total);
         even_content = rootView.findViewById(R.id.even_split_content);
         uneven_content = rootView.findViewById(R.id.uneven_split_content);
         people_layout = (TableLayout) rootView.findViewById(R.id.people_list);
         sales_tax = rootView.findViewById(R.id.sales_tax);
+        split_type = rootView.findViewById(R.id.split_type_button);
 
         setCalcListeners();
-        createPersonArray();
 
         split_card.animate().alpha(0f).translationY(-100f);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -135,6 +134,19 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         }
 
         setButtons(rootView);
+
+
+        rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if ((double) (rootView.getHeight()) / (rootView.getRootView().getHeight()) < .66) {
+                    rootView.findViewById(R.id.fab).setVisibility(View.INVISIBLE);
+                } else {
+                    rootView.findViewById(R.id.fab).setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
 
         return rootView;
     }
@@ -441,6 +453,43 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
                 calcSplits();
             }
         });
+
+        split_type.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!unevenShown) {
+                    even_content.setVisibility(View.GONE);
+                    uneven_content.setVisibility(View.VISIBLE);
+                    createPersonArray();
+                    ((Button) split_type).setText(main.getString(R.string.even_split_button_text));
+                    ((TextView) split_title).setText(main.getString(R.string.split_check_title_uneven));
+                    unevenShown = true;
+                } else {
+                    even_content.setVisibility(View.VISIBLE);
+                    uneven_content.setVisibility(View.GONE);
+                    calcSplits();
+                    ((Button) split_type).setText(main.getString(R.string.uneven_split_button_text));
+                    ((TextView) split_title).setText(main.getString(R.string.split_check_title_even));
+                    unevenShown = false;
+                }
+            }
+        });
+    }
+
+    @TargetApi(21)
+    private void splitToggleRipple() {
+        View target;
+        if (!unevenShown) {
+            target = uneven_content;
+        } else {
+            target = even_content;
+        }
+
+        int radius = (int) Math.sqrt((Math.pow(split_card.getWidth(), 2) + Math.pow(split_card.getHeight(),2)));
+        Animator toggle = ViewAnimationUtils.createCircularReveal(
+                target, split_card.getLeft(), split_card.getBottom(), 0, radius);
+        toggle.setDuration(500);
+        toggle.start();
     }
 
     @Override
@@ -495,6 +544,98 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         percentDialog.show(fm, "custom_percent_dialog");
     }
 
+    private void saleChanged() {
+        if (percent != 0 && recalculate) {
+            recalculate = false;
+            tip = sale * (percent / 100);
+            total = sale + tip;
+
+            ((TextView) tip_text).setText(String.format("%.2f", tip));
+            ((TextView) total_text).setText(String.format("%.2f", total));
+
+            recalculate = true;
+        }
+
+        if (!unevenShown) {
+            calcSplits();
+        } else if (unevenShown) {
+            calculateTaxRate();
+            calculateSalesTax();
+        }
+
+    }
+
+    private void percentChanged() {
+        if (sale != 0 && recalculate) {
+            recalculate = false;
+            tip = sale * (percent / 100);
+            total = sale + tip;
+
+            ((TextView) tip_text).setText(String.format("%.2f", tip));
+            ((TextView) total_text).setText(String.format("%.2f", total));
+
+            recalculate = true;
+        }
+
+        if (!unevenShown) {
+            calcSplits();
+        } else if (unevenShown) {
+            updateAllPersonValues();
+        }
+    }
+
+    private void tipChanged() {
+        if (sale != 0 && recalculate) {
+            recalculate = false;
+            percent = (tip / sale) * 100;
+            total = sale + tip;
+
+
+            addPercentToSpinner(percent, true);
+            ((TextView) total_text).setText(String.format("%.2f", total));
+
+            recalculate = true;
+        }
+
+        if (!unevenShown) {
+            calcSplits();
+        } else if (unevenShown) {
+            updateAllPersonValues();
+        }
+    }
+
+    private void totalChanged() {
+        if (sale != 0 && recalculate && total > sale) {
+            recalculate = false;
+            tip = total - sale;
+            percent = (tip / sale) * 100;
+
+            ((TextView) tip_text).setText(String.format("%.2f", tip));
+            addPercentToSpinner(percent, true);
+
+            recalculate = true;
+        }
+
+        if (!unevenShown) {
+            calcSplits();
+        } else if (unevenShown) {
+            updateAllPersonValues();
+        }
+
+    }
+
+    private void setPeople() {
+        ((TextView) people_count).setText(Integer.toString(people) + getString(R.string.people));
+    }
+
+    private void calcSplits() {
+        splitTip = tip / people;
+        splitTotal = total / people;
+
+        ((TextView) split_tip).setText(unitSymbol + String.format("%.2f", splitTip) + rootView.getResources().getString(R.string.tip_per));
+        ((TextView) split_total).setText(unitSymbol + String.format("%.2f", splitTotal));
+    }
+
     private void calculateTaxRate() {
         if (sale != 0 && !enteredTaxRate) {
             taxRate = tax / (sale - tax);
@@ -519,100 +660,6 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         recalculateTax = true;
     }
 
-    private void saleChanged() {
-        if (percent != 0 && recalculate) {
-            recalculate = false;
-            tip = sale * (percent / 100);
-            total = sale + tip;
-
-            ((TextView) tip_text).setText(String.format("%.2f", tip));
-            ((TextView) total_text).setText(String.format("%.2f", total));
-
-            recalculate = true;
-        }
-
-        if (even_content.isShown()) {
-            calcSplits();
-        } else if (uneven_content.isShown()) {
-            calculateTaxRate();
-            calculateSalesTax();
-        }
-
-    }
-
-    private void percentChanged() {
-        if (sale != 0 && recalculate) {
-            recalculate = false;
-            tip = sale * (percent / 100);
-            total = sale + tip;
-
-            ((TextView) tip_text).setText(String.format("%.2f", tip));
-            ((TextView) total_text).setText(String.format("%.2f", total));
-
-            recalculate = true;
-        }
-
-        if (even_content.isShown()) {
-            calcSplits();
-        } else if (uneven_content.isShown()) {
-            updateAllPersonValues();
-        }
-    }
-
-    private void tipChanged() {
-        if (sale != 0 && recalculate) {
-            recalculate = false;
-            percent = (tip / sale) * 100;
-            total = sale + tip;
-
-
-            addPercentToSpinner(percent, true);
-            ((TextView) total_text).setText(String.format("%.2f", total));
-
-            recalculate = true;
-        }
-
-        if (even_content.isShown()) {
-            calcSplits();
-        } else if (uneven_content.isShown()) {
-            updateAllPersonValues();
-        }
-    }
-
-    private void totalChanged() {
-        if (sale != 0 && recalculate && total > sale) {
-            recalculate = false;
-            tip = total - sale;
-            percent = (tip / sale) * 100;
-
-            ((TextView) tip_text).setText(String.format("%.2f", tip));
-            addPercentToSpinner(percent, true);
-
-            recalculate = true;
-        }
-
-        if (even_content.isShown()) {
-            calcSplits();
-        } else if (uneven_content.isShown()) {
-            updateAllPersonValues();
-        }
-
-    }
-
-    private void setPeople() {
-        ((TextView) people_count).setText(Integer.toString(people) + getString(R.string.people));
-    }
-
-    private void calcSplits() {
-        if (rootView.findViewById(R.id.even_split_content).getVisibility() == View.VISIBLE) {
-            splitTip = tip / people;
-            splitTotal = total / people;
-
-            ((TextView) split_tip).setText(unitSymbol + String.format("%.2f", splitTip) + rootView.getResources().getString(R.string.tip_per));
-            ((TextView) split_total).setText(unitSymbol + String.format("%.2f", splitTotal));
-        }
-    }
-
     private void createPersonArray() {
         peopleList.clear();
         people_layout.removeAllViews();
@@ -620,7 +667,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
         LayoutInflater LI = (LayoutInflater) rootView.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         LI.inflate(R.layout.table_row_title, people_layout);
 
-        for (int i = 0; i < defPeople; i++) {
+        for (int i = 0; i < people; i++) {
             addPersonToList();
         }
     }
@@ -653,7 +700,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
             @Override
             public void afterTextChanged(Editable s) {
                 try {
-                    if (s.length()!=0) {
+                    if (s.length() != 0) {
                         double personSub = Double.parseDouble(s.toString());
                         updatePersonValues(findPersonRow(subtotalv), personSub);
                     } else {
@@ -685,7 +732,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
 
     private void updateAllPersonValues() {
         for (int i = 1; i <= peopleList.size(); i++) {
-            updatePersonValues(i, peopleList.get(i-1).getSubtotal());
+            updatePersonValues(i, peopleList.get(i - 1).getSubtotal());
         }
     }
 
@@ -704,11 +751,18 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
                 ((ScrollView) scroll_view).smoothScrollTo(0, split_card.getBottom());
             }
         });
+
         setPeople();
-        calcSplits();
+
+        if (!unevenShown) {
+            calcSplits();
+        } else {
+            updateAllPersonValues();
+        }
     }
 
     private void hideCard(Animation animation) {
+        hideKeyboard();
         fab_plus.startAnimation(animation);
         split_card.animate().alpha(0f).translationY(-100f).setDuration(200).setListener(new AnimatorListenerAdapter() {
             @Override
@@ -724,6 +778,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
             }
         });
     }
+
 
     @TargetApi(21) // Remove the drop shadow from the + drawable
     private void removeFABPlusOutline(View plusView) {

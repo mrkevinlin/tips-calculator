@@ -24,8 +24,11 @@
     <string name="tip_per">\u0020from tips</string>
 
     <string name="person_list_title_person">Person</string>
-    <string name="person_list_title_items">Item Prices</string>
+    <string name="person_list_title_items">Item Price</string>
     <string name="person_list_subtotal">Subtotal</string>
+
+    <string name="even_split_button_text">Even splits</string>
+    <string name="uneven_split_button_text">Uneven splits</string>
 
     <string name="settings_text">Settings</string>
 
@@ -59,13 +62,17 @@
     <string name="pref_tax_message">Put the restaurant sales tax for your area as a percentage (like 8.25).</string>
     <string name="pref_tax_title">Enter sales tax</string>
 
-    <string name="general_help_text">Enter in the amount of the sale, and then filling any other
-        blank will cause the rest to calculate.</string>
+    <string name="general_help_text">Enter in the amount of the sale. Editing any other
+        blank will cause the rest to fill in.</string>
     <string name="functions_help_text"><![CDATA[  Clear all the values with
         <font color=#919191>RESET</font>, or round the total to the nearest whole dollar value with
         <font color=#3ea8c3>ROUND</font>.]]></string>
     <string name="split_help_text"><![CDATA[  Tap the + <font color="#8BC34A">button</font> to
-        toggle splitting the check. Tap again or decrease the total number of people to 1 to hide.]]></string>
+        toggle splitting the check. Tap again to hide.]]></string>
+    <string name="uneven_help_text"><![CDATA[  Tap <font color="#3ea8c3">UNEVEN SPLITS</font> in the split
+    check card to switch to an uneven split format. Enter in the sales tax (or have it calculated by
+    entering in your local tax rate in the settings) and then enter in the cost of the things each
+    person ordered.]]></string>
     <string name="send_feedback_text">Send Feedback</string>
     <string name="inquiry_text">Any bugs or suggestions? Leave a review or use the developer email listed there! Thanks!</string>
     <string name="contact_button_text">Play Store link</string>

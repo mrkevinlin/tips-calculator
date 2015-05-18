@@ -2,24 +2,26 @@
 <TableRow xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp">
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp">
 
     <TextView
+        android:layout_weight="1"
         android:gravity="center"
         android:text="@string/person_list_title_person" />
 
     <TextView
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        android:layout_weight="3"
+        android:layout_weight="2"
         android:gravity="center"
         android:text="@string/person_list_title_items"
         android:textColor="@color/blue" />
 
     <TextView
-        android:layout_weight="2"
+        android:layout_weight="1"
         android:gravity="center"
         android:text="@string/total_text"
-        android:textColor="@color/green"/>
+        android:textColor="@color/green" />
 
 </TableRow>

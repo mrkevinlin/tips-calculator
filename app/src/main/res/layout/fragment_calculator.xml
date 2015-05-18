@@ -160,7 +160,6 @@
                                 android:layout_alignParentTop="true"
                                 android:layout_centerHorizontal="true"
                                 android:text="@string/split_check_title_even" />
-                            <!-- Todo: switch text depending on equal or unequal-->
 
                             <Button
                                 android:id="@+id/take_people"
@@ -179,6 +178,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_below="@+id/split_title"
                                 android:layout_centerHorizontal="true"
+                                android:layout_marginTop="6dp"
                                 android:padding="8dp" />
 
                             <Button
@@ -199,8 +199,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:orientation="vertical"
-                            android:padding="24dp"
-                            android:visibility="gone"> <!--Todo: remove this line when implemented split button view switch-->
+                            android:padding="24dp">
 
                             <TextView
                                 android:id="@+id/split_total"
@@ -228,7 +227,8 @@
                         <RelativeLayout
                             android:id="@+id/uneven_split_content"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            android:visibility="gone">
 
                             <TextView
                                 android:id="@+id/dollar4"
@@ -266,9 +266,12 @@
                     </LinearLayout>
 
                     <Button
+                        android:id="@+id/split_type_button"
+                        style="@style/FunctionButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Splits" />
+                        android:text="@string/uneven_split_button_text"
+                        android:textColor="@color/blue" />
                 </LinearLayout>
             </android.support.v7.widget.CardView>
         </LinearLayout>
