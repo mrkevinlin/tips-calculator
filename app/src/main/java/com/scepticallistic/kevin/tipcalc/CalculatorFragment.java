@@ -686,6 +686,7 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
 
         //Todo: Calculate last subtotal based on the sale value???
         final MaterialEditText subtotalv = ((MaterialEditText) v.findViewById(R.id.person_subtotal));
+        subtotalv.setTag(peopleList.size());
         subtotalv.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -716,12 +717,11 @@ public class CalculatorFragment extends Fragment implements AdapterView.OnItemSe
     }
 
     private int findPersonRow(View v) {
-        for (int i = 0; i < people_layout.getChildCount(); i++) {
-            if (v.getParent().equals(people_layout.getChildAt(i))) {
-                return i;
-            }
+        Object tag = v.getTag();
+        if (tag == null || !(tag instanceof Integer)) {
+            return 0;
         }
-        return 0;
+        return (int) v.getTag();
     }
 
     private void updatePersonValues(int index, double sub) {
